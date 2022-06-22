@@ -5,10 +5,11 @@ class ComickApi {
   static Future<List<LibComic>> getListOfComic(int currentPage) async {
     final url = 'https://api.comick.fun/';
     List<LibComic> libComic = [];
-    var response = await http.get(Uri.parse(url + 'chapter?page=$currentPage'));
+    var response = await http
+        .get(Uri.parse(url + 'chapter?lang=en&page=$currentPage&order=hot'));
     var jsonresult = libComicFromJson(response.body);
-    print(jsonresult[0].hid);
-    print('Fetch called');
+    // print(jsonresult[0].hid);
+    // print('Fetch called');
     return jsonresult;
   }
 }

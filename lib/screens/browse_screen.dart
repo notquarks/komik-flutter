@@ -9,18 +9,18 @@ class BrowseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: CustomScrollView(
         slivers: [
-          const SliverAppBar(
-            title: Text('Browse'),
-            floating: true,
-          ),
+          SliverAppBar(
+              title: Text('Browse'),
+              floating: true,
+              expandedHeight: 150.0,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Text('Browse'),
+              ),
+              pinned: false),
           ComicGrid(),
-          SliverToBoxAdapter(
-            child:
-                ElevatedButton(onPressed: () {}, child: const Text('Test Api')),
-          )
         ],
       ),
     );
@@ -70,6 +70,12 @@ class _ComicGridState extends State<ComicGrid> {
   }
 
   @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SliverFillRemaining(
       child: RefreshIndicator(
@@ -78,9 +84,10 @@ class _ComicGridState extends State<ComicGrid> {
         ),
         child: PagedGridView(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 5,
-            crossAxisSpacing: 5.0,
-            mainAxisSpacing: 5.0,
+            crossAxisCount: 4,
+            crossAxisSpacing: 12.0,
+            mainAxisSpacing: 8.0,
+            childAspectRatio: (2.4 / 4.4),
           ),
           pagingController: _pagingController,
           builderDelegate: PagedChildBuilderDelegate<LibComic>(
@@ -92,11 +99,5 @@ class _ComicGridState extends State<ComicGrid> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _pagingController.dispose();
-    super.dispose();
   }
 }

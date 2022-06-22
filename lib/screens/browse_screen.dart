@@ -4,24 +4,82 @@ import 'package:komik_flutter/models/chap_comic.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-class BrowseScreen extends StatelessWidget {
+class BrowseScreen extends StatefulWidget {
   const BrowseScreen({Key? key}) : super(key: key);
 
   @override
+  State<BrowseScreen> createState() => _BrowseScreenState();
+}
+
+class _BrowseScreenState extends State<BrowseScreen> {
+  static const _pageSize = 40;
+
+  final _pagingController = PagingController<int, LibComic>(
+    firstPageKey: 1,
+  );
+
+  @override
+  void initState() {
+    _pagingController.addPageRequestListener((pageKey) {
+      _fetchPage(pageKey);
+    });
+    super.initState();
+  }
+
+  Future<void> _fetchPage(int pageKey) async {
+    try {
+      final newItems = await ComickApi.getListOfComic(pageKey);
+      print(newItems.length);
+      final isLastPage = pageKey > _pageSize;
+      if (isLastPage) {
+        _pagingController.appendLastPage(newItems);
+      } else {
+        final nextPageKey = pageKey + 1;
+        _pagingController.appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      print('error');
+      _pagingController.error = error;
+    }
+  }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-              title: Text('Browse'),
-              floating: true,
-              expandedHeight: 150.0,
-              flexibleSpace: FlexibleSpaceBar(
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: () => Future.sync(
+          () => _pagingController.refresh(),
+        ),
+        child: CustomScrollView(
+          slivers: [
+            const SliverAppBar(
                 title: Text('Browse'),
+                floating: true,
+                snap: true,
+                pinned: false),
+            PagedSliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                crossAxisSpacing: 10.0,
+                mainAxisSpacing: 8.0,
+                childAspectRatio: (2.4 / 4.4),
               ),
-              pinned: false),
-          ComicGrid(),
-        ],
+              pagingController: _pagingController,
+              builderDelegate: PagedChildBuilderDelegate<LibComic>(
+                animateTransitions: true,
+                itemBuilder: (context, item, index) => ComicListItem(
+                  comic: item,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

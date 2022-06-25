@@ -95,7 +95,6 @@ class MdComics {
     required this.country,
     required this.status,
     required this.translationCompleted,
-    required this.lastChapter,
     required this.createdAt,
     required this.genres,
     required this.mdCovers,
@@ -107,7 +106,6 @@ class MdComics {
   final String? country;
   final int status;
   final bool translationCompleted;
-  final String? lastChapter;
   final DateTime createdAt;
   final List<int> genres;
   final List<MdCover> mdCovers;
@@ -119,7 +117,6 @@ class MdComics {
         country: json["country"],
         status: json["status"],
         translationCompleted: json["translation_completed"] ?? false,
-        lastChapter: json["last_chapter"],
         createdAt: DateTime.parse(json["created_at"]),
         genres: List<int>.from(json["genres"].map((x) => x)),
         mdCovers: List<MdCover>.from(
@@ -133,7 +130,6 @@ class MdComics {
         "country": country,
         "status": status,
         "translation_completed": translationCompleted ? false : true,
-        "last_chapter": lastChapter,
         "created_at": createdAt.toIso8601String(),
         "genres": List<dynamic>.from(genres.map((x) => x)),
         "md_covers": List<dynamic>.from(mdCovers.map((x) => x.toJson())),

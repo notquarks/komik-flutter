@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:komik_flutter/components/comic_item.dart';
-import 'package:komik_flutter/models/chap_comic.dart';
+import 'package:komik_flutter/controllers/fetch_comick.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:komik_flutter/screens/comic_screen.dart';
 
 class BrowseScreen extends StatefulWidget {
   const BrowseScreen({Key? key}) : super(key: key);
@@ -27,6 +28,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
   }
 
   Future<void> _fetchPage(int pageKey) async {
+    // final newItems = await ComickApi.getListOfComic(pageKey);
     try {
       final newItems = await ComickApi.getListOfComic(pageKey);
       print(newItems.length);
@@ -36,6 +38,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
       } else {
         final nextPageKey = pageKey + 1;
         _pagingController.appendPage(newItems, nextPageKey);
+        print(nextPageKey);
       }
     } catch (error) {
       print('error');
@@ -73,8 +76,16 @@ class _BrowseScreenState extends State<BrowseScreen> {
               pagingController: _pagingController,
               builderDelegate: PagedChildBuilderDelegate<LibComic>(
                 animateTransitions: true,
-                itemBuilder: (context, item, index) => ComicListItem(
-                  comic: item,
+                itemBuilder: (context, item, index) => InkWell(
+                  onTap: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (childContext) {
+                      return ComicPage(comic: item, hid: item.hid);
+                    }));
+                  },
+                  child: ComicListItem(
+                    comic: item,
+                  ),
                 ),
               ),
             ),

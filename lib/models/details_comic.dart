@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:komik_flutter/models/lib_comic.dart';
+
 DetailsComic detailsComicFromJson(String str) =>
     DetailsComic.fromJson(json.decode(str));
 
@@ -26,8 +28,8 @@ class DetailsComic {
   });
 
   Chapter chapter;
-  Next next;
-  Next prev;
+  dynamic next;
+  dynamic prev;
   bool matureContent;
   List<Next> chapters;
   List<Next> dupGroupChapters;
@@ -40,8 +42,8 @@ class DetailsComic {
 
   factory DetailsComic.fromJson(Map<String, dynamic> json) => DetailsComic(
         chapter: Chapter.fromJson(json["chapter"]),
-        next: Next.fromJson(json["next"]),
-        prev: Next.fromJson(json["prev"]),
+        next: json["next"],
+        prev: json["prev"],
         matureContent: json["matureContent"],
         chapters:
             List<Next>.from(json["chapters"].map((x) => Next.fromJson(x))),
@@ -58,8 +60,8 @@ class DetailsComic {
 
   Map<String, dynamic> toJson() => {
         "chapter": chapter.toJson(),
-        "next": next.toJson(),
-        "prev": prev.toJson(),
+        "next": next,
+        "prev": prev,
         "matureContent": matureContent,
         "chapters": List<dynamic>.from(chapters.map((x) => x.toJson())),
         "dupGroupChapters":
@@ -390,7 +392,7 @@ class Next {
   dynamic vol;
   String? title;
   String? chap;
-  String? groupName;
+  dynamic groupName;
   String? lang;
   dynamic mdGroupId;
   List<dynamic> mdChaptersGroups;
@@ -423,4 +425,86 @@ class Next {
             List<dynamic>.from(mdChaptersGroups.map((x) => x)),
         "href": href == null ? null : href,
       };
+}
+
+enum GroupName {
+  ALPHASCANS,
+  REAPERSCANS,
+  REAPER_SCANS,
+  KKJ_SCANS,
+  OFFICIAL,
+  WE_SCANS,
+  WE_SCAN,
+  FUK_SCANS
+}
+
+final groupNameValues = EnumValues({
+  "alphascans": GroupName.ALPHASCANS,
+  "Fuk Scans": GroupName.FUK_SCANS,
+  "KKJ Scans": GroupName.KKJ_SCANS,
+  "Official": GroupName.OFFICIAL,
+  "reaperscans": GroupName.REAPERSCANS,
+  "Reaper_Scans": GroupName.REAPER_SCANS,
+  "WeScan": GroupName.WE_SCAN,
+  "WeScans": GroupName.WE_SCANS
+});
+
+class Prev {
+  Prev({
+    required this.id,
+    required this.hid,
+    required this.vol,
+    required this.title,
+    required this.chap,
+    required this.mdGroupId,
+    required this.mdChaptersGroups,
+    required this.href,
+  });
+
+  int? id;
+  String? hid;
+  String? vol;
+  String? title;
+  String? chap;
+  int? mdGroupId;
+  List<int> mdChaptersGroups;
+  String? href;
+
+  factory Prev.fromJson(Map<String, dynamic> json) => Prev(
+        id: json["id"],
+        hid: json["hid"],
+        vol: json["vol"] == null ? null : json["vol"],
+        title: json["title"] == null ? null : json["title"],
+        chap: json["chap"],
+        mdGroupId: json["md_group_id"] == null ? null : json["md_group_id"],
+        mdChaptersGroups:
+            List<int>.from(json["md_chapters_groups"].map((x) => x)),
+        href: json["href"] == null ? null : json["href"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "hid": hid,
+        "vol": vol == null ? null : vol,
+        "title": title == null ? null : title,
+        "chap": chap,
+        "md_group_id": mdGroupId == null ? null : mdGroupId,
+        "md_chapters_groups":
+            List<dynamic>.from(mdChaptersGroups.map((x) => x)),
+        "href": href == null ? null : href,
+      };
+}
+
+class EnumValues<T> {
+  Map<String, T> map;
+  late Map<T, String> reverseMap;
+
+  EnumValues(this.map);
+
+  Map<T, String> get reverse {
+    if (reverseMap == null) {
+      reverseMap = map.map((k, v) => new MapEntry(v, k));
+    }
+    return reverseMap;
+  }
 }

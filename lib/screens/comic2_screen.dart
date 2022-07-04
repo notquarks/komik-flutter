@@ -8,39 +8,44 @@ import 'package:komik_flutter/models/details_comic.dart';
 import 'package:komik_flutter/models/lchap_comic.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:komik_flutter/models/top_comic.dart';
 import 'package:komik_flutter/screens/read_screen.dart';
 
-class ComicPage extends ConsumerStatefulWidget {
-  ComicPage({Key? key, required this.comic, required this.hid})
+class ComicPage2 extends ConsumerStatefulWidget {
+  ComicPage2({Key? key, required this.comic, required this.slug})
       : super(key: key);
-  LibComic comic;
-  String hid;
+  Completion comic;
+  String slug;
 
   @override
-  ConsumerState<ComicPage> createState() => _ComicPageState();
+  ConsumerState<ComicPage2> createState() => _ComicPage2State();
 }
 
-class _ComicPageState extends ConsumerState<ComicPage> {
+class _ComicPage2State extends ConsumerState<ComicPage2> {
   List<DetailsComic> detailsComic = <DetailsComic>[];
   List<ListChapters> chaptersComic = <ListChapters>[];
   List<ComicDescSlug> descComic = <ComicDescSlug>[];
 
   @override
   void initState() {
-    _fetchData(widget.hid);
+    _fetchData(widget.slug).then((value) {
+      _fetchData2(descComic.first.comic.id);
+    });
     super.initState();
   }
 
-  Future _fetchData(String hid) async {
-    var resultDetails = await ComickApi.getComicDetails(widget.hid);
-    var resultChapters =
-        await ComickApi.getListChapters(widget.comic.mdComics.id);
-    var resultDesc =
-        await ComickApi.getComicDescSlug(widget.comic.mdComics.slug);
+  Future _fetchData(String slug) async {
+    var resultDesc = await ComickApi.getComicDescSlug(slug);
     setState(() {
-      detailsComic.addAll(resultDetails);
-      chaptersComic.addAll(resultChapters);
       descComic.addAll(resultDesc);
+    });
+  }
+
+  Future _fetchData2(int hid) async {
+    var resultChapters = await ComickApi.getListChapters(hid);
+
+    setState(() {
+      chaptersComic.addAll(resultChapters);
     });
   }
 
@@ -48,12 +53,10 @@ class _ComicPageState extends ConsumerState<ComicPage> {
   Widget build(BuildContext context) {
     // final comicDetails = ref.watch(comicInfoProvider(widget.hid));
     return Scaffold(
-      body: (detailsComic.isNotEmpty &&
-              chaptersComic.isNotEmpty &&
-              descComic.isNotEmpty)
+      body: (chaptersComic.isNotEmpty && descComic.isNotEmpty)
           ? CustomScrollView(slivers: [
               SliverAppBar(
-                title: Text(widget.comic.mdComics.title),
+                title: Text(widget.comic.title),
                 floating: true,
               ),
               _detailsComic(widget.comic, descComic.first),
@@ -74,7 +77,7 @@ class _ComicPageState extends ConsumerState<ComicPage> {
     );
   }
 
-  Widget _detailsComic(LibComic comic, ComicDescSlug comicDetails) {
+  Widget _detailsComic(Completion comic, ComicDescSlug comicDetails) {
     return SliverToBoxAdapter(
       child: Column(
         children: [
@@ -87,9 +90,9 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CachedNetworkImage(
-                      imageUrl: (comic.mdComics.mdCovers[0].gpurl != null)
-                          ? "${comic.mdComics.mdCovers[0].gpurl}.256.jpg"
-                          : 'https://meo.comick.pictures/${comic.mdComics.mdCovers[0].b2Key}',
+                      imageUrl: (comic.mdCovers.first.gpurl != null)
+                          ? "${comic.mdCovers.first.gpurl}.256.jpg"
+                          : 'https://meo.comick.pictures/${comic.mdCovers.first.b2Key}',
                       fit: BoxFit.cover,
                       width: 1080,
                       height: 255,
@@ -129,12 +132,10 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(15.0),
                                     child: CachedNetworkImage(
-                                      imageUrl: (comic
-                                                  .mdComics.mdCovers[0].gpurl !=
-                                              null)
-                                          ? "${comic.mdComics.mdCovers[0].gpurl}.256.jpg"
-                                          : 'https://meo.comick.pictures/${comic.mdComics.mdCovers[0].b2Key}',
-                                    ),
+                                        imageUrl: (comic.mdCovers.first.gpurl !=
+                                                null)
+                                            ? "${comic.mdCovers.first.gpurl}.256.jpg"
+                                            : 'https://meo.comick.pictures/${comic.mdCovers.first.b2Key}'),
                                   ),
                                 ),
                                 Padding(
@@ -142,7 +143,56 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                                       bottom: 8.0, top: 16.0),
                                   child: Container(
                                     decoration: const BoxDecoration(),
-                                    child: _comicTitleAuthor(comicDetails),
+                                    child: SizedBox(
+                                      width: 260,
+                                      height: 165,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 12.0),
+                                        child: Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                comicDetails.comic.title,
+                                                softWrap: true,
+                                                maxLines: 4,
+                                                textAlign: TextAlign.left,
+                                                style: const TextStyle(
+                                                    fontSize: 22.0,
+                                                    fontWeight: FontWeight.w500,
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
+                                              ),
+                                              Text(
+                                                comicDetails.artists
+                                                    .map((e) => e.name)
+                                                    .toString()
+                                                    .replaceAll(
+                                                        RegExp('[^A-Za-z0-9,]'),
+                                                        ''),
+                                                softWrap: true,
+                                                textAlign: TextAlign.left,
+                                              ),
+                                              Text(
+                                                (comicDetails.comic.status == 1)
+                                                    ? 'Ongoing'
+                                                    : 'Completed',
+                                                softWrap: true,
+                                                textAlign: TextAlign.left,
+                                                style: const TextStyle(
+                                                  fontSize: 14.0,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -160,7 +210,7 @@ class _ComicPageState extends ConsumerState<ComicPage> {
           Container(
             // color: Colors.amber,
             child: SizedBox(
-              width: MediaQuery.of(context).size.width,
+              width: 1080,
               // height: 520.h,
               child: Align(
                 alignment: Alignment.topLeft,
@@ -201,51 +251,6 @@ class _ComicPageState extends ConsumerState<ComicPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _comicTitleAuthor(ComicDescSlug comicDetails) {
-    return SizedBox(
-      width: 260,
-      height: 165,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 12.0),
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                comicDetails.comic.title,
-                softWrap: true,
-                maxLines: 4,
-                textAlign: TextAlign.left,
-                style: const TextStyle(
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.w500,
-                    overflow: TextOverflow.ellipsis),
-              ),
-              Text(
-                comicDetails.artists
-                    .map((e) => e.name)
-                    .toString()
-                    .replaceAll(RegExp('[^A-Za-z0-9,]'), ''),
-                softWrap: true,
-                textAlign: TextAlign.left,
-              ),
-              Text(
-                (comicDetails.comic.status == 1) ? 'Ongoing' : 'Completed',
-                softWrap: true,
-                textAlign: TextAlign.left,
-                style: const TextStyle(
-                  fontSize: 14.0,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Baca Komik on Flutter',
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.dark,
       darkTheme: FlexThemeData.dark(
         scheme: FlexScheme.brandBlue,
         useMaterial3: true,

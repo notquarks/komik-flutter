@@ -1,14 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:komik_flutter/controllers/fetch_comick.dart';
+import 'package:komik_flutter/controllers/save_data.dart';
 import 'package:komik_flutter/models/descslug_comic.dart';
 import 'package:komik_flutter/models/details_comic.dart';
 import 'package:komik_flutter/models/lchap_comic.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:komik_flutter/models/save_comic.dart';
 import 'package:komik_flutter/screens/read_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ComicPage extends ConsumerStatefulWidget {
   ComicPage({Key? key, required this.comic, required this.hid})
@@ -24,7 +30,6 @@ class _ComicPageState extends ConsumerState<ComicPage> {
   List<DetailsComic> detailsComic = <DetailsComic>[];
   List<ListChapters> chaptersComic = <ListChapters>[];
   List<ComicDescSlug> descComic = <ComicDescSlug>[];
-
   @override
   void initState() {
     _fetchData(widget.hid);
@@ -105,7 +110,7 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                       end: Alignment.bottomCenter,
                       colors: [
                         Color.fromARGB(238, 53, 76, 102),
-                        Color.fromARGB(255, 37, 37, 63),
+                        Color.fromARGB(240, 37, 37, 63),
                         Color.fromARGB(255, 38, 41, 48)
                       ]),
                 ),
@@ -148,9 +153,44 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                               ],
                             )),
                         Container(
-                          child: ElevatedButton(
-                              onPressed: () {},
-                              child: const Text('Add to Library')),
+                          child: Row(
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () {},
+                                  child: const Text('Add to Library')),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0),
+                                child: InkWell(
+                                  onTap: () {
+                                    launchUrl(
+                                      Uri.parse(
+                                          'https://comick.fun/comic/${comicDetails.comic.slug}'),
+                                    );
+                                  },
+                                  child: const Icon(
+                                    Icons.public,
+                                    color: Color.fromRGBO(139, 157, 195, 1),
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Clipboard.setData(ClipboardData(
+                                          text:
+                                              "https://comick.fun/comic/${comicDetails.comic.slug}"))
+                                      .then((result) {
+                                    Fluttertoast.showToast(
+                                        msg: "Link Copied !");
+                                  });
+                                },
+                                child: const Icon(
+                                  Icons.link,
+                                  color: Color.fromRGBO(139, 157, 195, 1),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ]),
                 ),

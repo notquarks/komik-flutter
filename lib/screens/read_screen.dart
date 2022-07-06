@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:komik_flutter/controllers/fetch_comick.dart';
 import 'package:komik_flutter/models/details_comic.dart';
 
@@ -67,6 +68,12 @@ class _ReadPageState extends State<ReadPage> {
                               imageUrl:
                                   'https://i0.wp.com/elkadii.ponpes.id/wp-content/uploads/2018/10/placeholder.jpg?ssl=1',
                               fit: BoxFit.fitWidth,
+                              cacheKey: "meo.comick.pictures",
+                              cacheManager: CacheManager(Config(
+                                "meo.comick.pictures",
+                                maxNrOfCacheObjects: 10,
+                                stalePeriod: const Duration(days: 2),
+                              )),
                             ),
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.error),

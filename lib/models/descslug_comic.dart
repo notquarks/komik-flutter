@@ -115,7 +115,7 @@ class Comic {
   String country;
   int? status;
   Links links;
-  int? lastChapter;
+  String? lastChapter;
   int? demographic;
   int? mdid;
   bool hentai;
@@ -147,7 +147,7 @@ class Comic {
         country: json["country"],
         status: json["status"],
         links: Links.fromJson(json["links"]),
-        lastChapter: json["last_chapter"],
+        lastChapter: json["last_chapter"].toString(),
         demographic: json["demographic"],
         mdid: json["mdid"],
         hentai: json["hentai"],

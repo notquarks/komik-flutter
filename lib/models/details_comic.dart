@@ -105,7 +105,7 @@ class Chapter {
   dynamic vol;
   String? title;
   String? server;
-  String? hid;
+  String hid;
   String? hash;
   dynamic groupName;
   dynamic chapterId;

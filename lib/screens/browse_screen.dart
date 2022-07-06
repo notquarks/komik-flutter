@@ -6,16 +6,18 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:komik_flutter/models/top_comic.dart';
 import 'package:komik_flutter/screens/comic2_screen.dart';
 import 'package:komik_flutter/screens/comic_screen.dart';
+import 'package:komik_flutter/screens/settings_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BrowseScreen extends StatelessWidget {
   const BrowseScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: DefaultTabController(
-        length: 2,
-        child: NestedScrollView(
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               SliverAppBar(
@@ -23,7 +25,14 @@ class BrowseScreen extends StatelessWidget {
                 floating: true,
                 pinned: true,
                 actions: [
-                  IconButton(onPressed: () {}, icon: const Icon(Icons.sort))
+                  IconButton(
+                      onPressed: () {
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (context) {
+                          return SettingPage();
+                        }));
+                      },
+                      icon: const Icon(Icons.settings))
                 ],
                 bottom: const TabBar(tabs: [
                   Tab(child: Text('Popular')),
@@ -67,7 +76,6 @@ class _TopScreenState extends State<TopScreen> {
   Future<void> _fetchPage(int pageKey) async {
     try {
       final newItems = await ComickApi.getTopComic(pageKey);
-      print("length: ${newItems.length}");
       final isLastPage = pageKey >= _pageSize;
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);

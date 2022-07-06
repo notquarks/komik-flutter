@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:komik_flutter/controllers/fetch_comick.dart';
 import 'package:komik_flutter/models/descslug_comic.dart';
 import 'package:komik_flutter/models/details_comic.dart';
@@ -10,6 +12,7 @@ import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:komik_flutter/models/top_comic.dart';
 import 'package:komik_flutter/screens/read_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ComicPage2 extends ConsumerStatefulWidget {
   ComicPage2({Key? key, required this.comic, required this.slug})
@@ -60,17 +63,18 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                 floating: true,
               ),
               _detailsComic(widget.comic, descComic.first),
-              SliverToBoxAdapter(child: Divider()),
+              const SliverToBoxAdapter(child: const Divider()),
               SliverPadding(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 sliver: SliverToBoxAdapter(
                   child: Text(
                     '${chaptersComic.first.chapters.length} Chapters',
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),
-              SliverToBoxAdapter(child: Divider()),
+              const SliverToBoxAdapter(child: Divider()),
               _listComicChapters(chaptersComic.first)
             ])
           : _loadingIndicator(),
@@ -108,7 +112,7 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                       end: Alignment.bottomCenter,
                       colors: [
                         Color.fromARGB(238, 53, 76, 102),
-                        Color.fromARGB(255, 37, 37, 63),
+                        Color.fromARGB(240, 37, 37, 63),
                         Color.fromARGB(255, 38, 41, 48)
                       ]),
                 ),
@@ -198,9 +202,44 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                               ],
                             )),
                         Container(
-                          child: ElevatedButton(
-                              onPressed: () {},
-                              child: const Text('Add to Library')),
+                          child: Row(
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () {},
+                                  child: const Text('Add to Library')),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0),
+                                child: InkWell(
+                                  onTap: () {
+                                    launchUrl(
+                                      Uri.parse(
+                                          'https://comick.fun/comic/${comicDetails.comic.slug}'),
+                                    );
+                                  },
+                                  child: const Icon(
+                                    Icons.public,
+                                    color: Color.fromRGBO(139, 157, 195, 1),
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Clipboard.setData(ClipboardData(
+                                          text:
+                                              "https://comick.fun/comic/${comicDetails.comic.slug}"))
+                                      .then((result) {
+                                    Fluttertoast.showToast(
+                                        msg: "Link Copied !");
+                                  });
+                                },
+                                child: const Icon(
+                                  Icons.link,
+                                  color: Color.fromRGBO(139, 157, 195, 1),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ]),
                 ),

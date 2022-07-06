@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:komik_flutter/models/top_comic.dart';
 
@@ -93,6 +94,11 @@ class ComicListItem2 extends StatelessWidget {
                       imageUrl:
                           'https://i0.wp.com/elkadii.ponpes.id/wp-content/uploads/2018/10/placeholder.jpg?ssl=1',
                       fit: BoxFit.fitHeight,
+                      cacheManager: CacheManager(Config(
+                        "meo.comick.pictures",
+                        maxNrOfCacheObjects: 20,
+                        stalePeriod: const Duration(days: 2),
+                      )),
                     ),
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.error),

@@ -39,7 +39,7 @@ class ComickApi {
     var response = await http.get(Uri.parse(url));
     var jsonresult = topComicFromJson(response.body);
     topComic.add(jsonresult);
-    // print(jsonresult[0].hid);
+    print('top: ${jsonresult.rank.length}');
     // print('Fetch called');
     return topComic.first.rank;
   }

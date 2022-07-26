@@ -1,27 +1,40 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expandable/expandable.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:isar/isar.dart';
+import 'package:komik_flutter/collections/comic_col.dart';
+import 'package:komik_flutter/collections/history_col.dart';
 import 'package:komik_flutter/controllers/fetch_comick.dart';
-import 'package:komik_flutter/controllers/save_data.dart';
 import 'package:komik_flutter/models/descslug_comic.dart';
 import 'package:komik_flutter/models/details_comic.dart';
 import 'package:komik_flutter/models/lchap_comic.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:komik_flutter/models/save_comic.dart';
 import 'package:komik_flutter/screens/read_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ComicPage extends ConsumerStatefulWidget {
-  ComicPage({Key? key, required this.comic, required this.hid})
-      : super(key: key);
-  LibComic comic;
+  ComicPage({
+    Key? key,
+    required this.id,
+    required this.hid,
+    required this.slug,
+    required this.title,
+    required this.isar,
+    required this.chap,
+    required this.cvUrl,
+  }) : super(key: key);
+  int id;
   String hid;
-
+  String slug;
+  String title;
+  String chap;
+  String cvUrl;
+  Isar isar;
   @override
   ConsumerState<ComicPage> createState() => _ComicPageState();
 }
@@ -30,18 +43,22 @@ class _ComicPageState extends ConsumerState<ComicPage> {
   List<DetailsComic> detailsComic = <DetailsComic>[];
   List<ListChapters> chaptersComic = <ListChapters>[];
   List<ComicDescSlug> descComic = <ComicDescSlug>[];
+  List<String> readed_chap = [];
+
+  bool isBookmarked = false;
+
   @override
   void initState() {
     _fetchData(widget.hid);
+    _checkLibrary(widget.isar);
+    _readHistory(widget.isar);
     super.initState();
   }
 
   Future _fetchData(String hid) async {
     var resultDetails = await ComickApi.getComicDetails(widget.hid);
-    var resultChapters =
-        await ComickApi.getListChapters(widget.comic.mdComics.id);
-    var resultDesc =
-        await ComickApi.getComicDescSlug(widget.comic.mdComics.slug);
+    var resultChapters = await ComickApi.getListChapters(widget.id);
+    var resultDesc = await ComickApi.getComicDescSlug(widget.slug);
     setState(() {
       detailsComic.addAll(resultDetails);
       chaptersComic.addAll(resultChapters);
@@ -58,16 +75,17 @@ class _ComicPageState extends ConsumerState<ComicPage> {
               descComic.isNotEmpty)
           ? CustomScrollView(slivers: [
               SliverAppBar(
-                title: Text(widget.comic.mdComics.title),
+                title: Text(widget.title),
                 floating: true,
               ),
-              _detailsComic(widget.comic, descComic.first),
+              _detailsComic(descComic.first),
               SliverToBoxAdapter(child: Divider()),
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                //Dislay Total Chapters
                 sliver: SliverToBoxAdapter(
                   child: Text(
-                    '${chaptersComic.first.chapters.length} Chapters',
+                    '${chaptersComic.first.total} Chapters',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -79,31 +97,31 @@ class _ComicPageState extends ConsumerState<ComicPage> {
     );
   }
 
-  Widget _detailsComic(LibComic comic, ComicDescSlug comicDetails) {
+  Widget _detailsComic(ComicDescSlug comicDetails) {
     return SliverToBoxAdapter(
       child: Column(
         children: [
           SizedBox(
             height: 255,
             child: Stack(children: [
+              //Background Cover Pic
               Container(
                 width: 1080,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CachedNetworkImage(
-                      imageUrl: (comic.mdComics.mdCovers[0].gpurl != null)
-                          ? "${comic.mdComics.mdCovers[0].gpurl}.256.jpg"
-                          : 'https://meo.comick.pictures/${comic.mdComics.mdCovers[0].b2Key}',
+                      imageUrl: widget.cvUrl,
                       fit: BoxFit.cover,
                       width: 1080,
-                      height: 255,
+                      height: 250,
                     ),
                   ],
                 ),
               ),
+              //Background Cover
               Container(
-                height: 670,
+                height: 900,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                       begin: Alignment.topCenter,
@@ -134,11 +152,7 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(15.0),
                                     child: CachedNetworkImage(
-                                      imageUrl: (comic
-                                                  .mdComics.mdCovers[0].gpurl !=
-                                              null)
-                                          ? "${comic.mdComics.mdCovers[0].gpurl}.256.jpg"
-                                          : 'https://meo.comick.pictures/${comic.mdComics.mdCovers[0].b2Key}',
+                                      imageUrl: widget.cvUrl,
                                     ),
                                   ),
                                 ),
@@ -155,9 +169,17 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                         Container(
                           child: Row(
                             children: [
-                              ElevatedButton(
-                                  onPressed: () {},
-                                  child: const Text('Add to Library')),
+                              (isBookmarked)
+                                  ? ElevatedButton(
+                                      onPressed: () {
+                                        _removeComic(widget.isar);
+                                      },
+                                      child: const Text('Remove from Library'))
+                                  : ElevatedButton(
+                                      onPressed: () {
+                                        _addComic(widget.isar);
+                                      },
+                                      child: const Text('Add to Library')),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12.0),
@@ -295,10 +317,17 @@ class _ComicPageState extends ConsumerState<ComicPage> {
       delegate: SliverChildBuilderDelegate(
         childCount: comicCh.chapters.length,
         ((context, index) {
+          final chTitle = 'Ch. ${comicCh.chapters[index].chap} '
+              ' ${comicCh.chapters[index].title ?? ''}';
           return Card(
             color: const Color.fromARGB(255, 48, 52, 60),
             child: ListTile(
               onTap: () {
+                _addToHistory(
+                    widget.isar,
+                    chTitle,
+                    comicCh.chapters[index].hid.toString(),
+                    comicCh.chapters[index].id);
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
                   return ReadPage(
@@ -312,9 +341,9 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                 style: const TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
+              //title chapter
               title: Text(
-                'Ch. ${comicCh.chapters[index].chap} '
-                ' ${comicCh.chapters[index].title ?? ''}',
+                chTitle,
                 maxLines: 2,
                 style: const TextStyle(fontSize: 13),
               ),
@@ -338,5 +367,90 @@ class _ComicPageState extends ConsumerState<ComicPage> {
     return const Center(
         child: SizedBox(
             width: 20, height: 20, child: CircularProgressIndicator()));
+  }
+
+  _checkLibrary(Isar isar) async {
+    final comicCollection = isar.comicCols;
+    final getComic = await comicCollection.get(widget.id);
+    if (getComic != null) {
+      print(getComic.toString());
+      setState(() {
+        isBookmarked = true;
+      });
+    } else {
+      setState(() {
+        isBookmarked = false;
+      });
+    }
+  }
+
+  _readHistory(Isar isar) async {
+    final historyCollection = isar.historys;
+    final getHistory = await historyCollection.getByHid(widget.hid);
+    if (getHistory != null) {
+      if (mounted) {
+        setState(() {
+          readed_chap = getHistory.read;
+        });
+      }
+    }
+  }
+
+  _addToHistory(Isar isar, String chTitle, String hid_chap, int id_chap) async {
+    final historyCollection = isar.historys;
+
+    readed_chap.add(hid_chap);
+    await isar.writeTxn((isar) async {
+      final getComicHistory = await historyCollection.getByHid(widget.hid);
+      print(getComicHistory.toString());
+      if (getComicHistory == null) {
+        final addHistory = History()
+          ..id = widget.id
+          ..hid = hid_chap
+          ..lastRead = DateTime.now()
+          ..chapter_title = chTitle
+          ..title = widget.title
+          ..slug = widget.slug
+          ..ch_id = id_chap
+          ..cvUrl = widget.cvUrl
+          ..read = readed_chap.toSet().toList();
+        await historyCollection.put(addHistory);
+      } else {
+        print('TEst');
+        getComicHistory.ch_id = id_chap;
+        getComicHistory.hid = hid_chap;
+        getComicHistory.chapter_title = chTitle;
+        getComicHistory.lastRead = DateTime.now();
+        getComicHistory.read = readed_chap.toSet().toList();
+        getComicHistory.cvUrl = widget.cvUrl;
+        await historyCollection.put(getComicHistory);
+      }
+    });
+  }
+
+  _addComic(Isar isar) async {
+    final comicCollection = isar.comicCols;
+    final addComic = ComicCol()
+      ..id = widget.id
+      ..hid = widget.hid
+      ..slug = widget.slug
+      ..title = widget.title
+      ..chap = widget.chap
+      ..cvUrl = widget.cvUrl;
+    await isar.writeTxn((isar) async {
+      await comicCollection.put(addComic, saveLinks: true);
+    });
+    _checkLibrary(isar);
+  }
+
+  _removeComic(Isar isar) async {
+    final comicCollection = isar.comicCols;
+    await isar.writeTxn((isar) async {
+      comicCollection.delete(widget.id);
+    });
+    setState(() {
+      isBookmarked = false;
+    });
+    _checkLibrary(isar);
   }
 }

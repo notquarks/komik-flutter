@@ -124,8 +124,8 @@ class Comic {
   int? followRank;
   int? commentCount;
   int? followCount;
-  String desc;
-  String parsed;
+  String? desc;
+  String? parsed;
   String slug;
   int? year;
   String? bayesianRating;

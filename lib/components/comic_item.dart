@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:komik_flutter/collections/comic_col.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:komik_flutter/models/top_comic.dart';
 
@@ -13,6 +14,8 @@ class ComicListItem extends StatelessWidget {
       width: 214,
       height: 311,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Expanded(
             child: Container(
@@ -50,7 +53,7 @@ class ComicListItem extends StatelessWidget {
             textAlign: TextAlign.left,
             style: const TextStyle(
               overflow: TextOverflow.ellipsis,
-              fontSize: 13.4,
+              fontSize: 12.8,
             ),
           )
         ],
@@ -71,6 +74,8 @@ class ComicListItem2 extends StatelessWidget {
       width: 214,
       height: 311,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Expanded(
             child: Container(
@@ -109,6 +114,62 @@ class ComicListItem2 extends StatelessWidget {
           ),
           Text(
             '${comict.title}\n',
+            maxLines: 2,
+            textAlign: TextAlign.left,
+            style: const TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 13.4,
+            ),
+          )
+        ],
+      ),
+    );
+    // ListTile(
+    //   leading: Text(comic.mdComics.title),
+    // );
+  }
+}
+
+class ComicListItem3 extends StatelessWidget {
+  const ComicListItem3({Key? key, required this.comic}) : super(key: key);
+  final ComicCol comic;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 214,
+      height: 311,
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                      width: 1, color: Colors.grey, style: BorderStyle.solid)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(9.0),
+                child: SizedBox(
+                  width: 214,
+                  height: 311,
+                  child: CachedNetworkImage(
+                    fit: BoxFit.fitHeight,
+                    maxHeightDiskCache: 300,
+                    maxWidthDiskCache: 200,
+                    imageUrl: comic.cvUrl,
+                    placeholder: (context, url) => CachedNetworkImage(
+                      imageUrl:
+                          'https://i0.wp.com/elkadii.ponpes.id/wp-content/uploads/2018/10/placeholder.jpg?ssl=1',
+                      fit: BoxFit.fitHeight,
+                    ),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Text(
+            '${comic.title}\n',
             maxLines: 2,
             textAlign: TextAlign.left,
             style: const TextStyle(

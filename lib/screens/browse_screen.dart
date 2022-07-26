@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
 import 'package:komik_flutter/components/comic_item.dart';
 import 'package:komik_flutter/controllers/fetch_comick.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
@@ -7,11 +8,10 @@ import 'package:komik_flutter/models/top_comic.dart';
 import 'package:komik_flutter/screens/comic2_screen.dart';
 import 'package:komik_flutter/screens/comic_screen.dart';
 import 'package:komik_flutter/screens/settings_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class BrowseScreen extends StatelessWidget {
-  const BrowseScreen({Key? key}) : super(key: key);
-
+  const BrowseScreen({Key? key, required this.isar}) : super(key: key);
+  final Isar isar;
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -42,8 +42,8 @@ class BrowseScreen extends StatelessWidget {
             ];
           },
           body: TabBarView(children: [
-            TopScreen(),
-            const PopularScreen(),
+            TopScreen(isar: isar),
+            NewScreen(isar: isar),
           ]),
         ),
       ),
@@ -52,8 +52,8 @@ class BrowseScreen extends StatelessWidget {
 }
 
 class TopScreen extends StatefulWidget {
-  TopScreen({Key? key}) : super(key: key);
-
+  TopScreen({Key? key, required this.isar}) : super(key: key);
+  final Isar isar;
   @override
   State<TopScreen> createState() => _TopScreenState();
 }
@@ -61,7 +61,7 @@ class TopScreen extends StatefulWidget {
 class _TopScreenState extends State<TopScreen> {
   static const _pageSize = 2;
 
-  final _pagingController = PagingController<int, Completion>(
+  late final _pagingController = PagingController<int, Completion>(
     firstPageKey: 1,
   );
 
@@ -146,17 +146,17 @@ class _TopScreenState extends State<TopScreen> {
   }
 }
 
-class PopularScreen extends StatefulWidget {
-  const PopularScreen({Key? key}) : super(key: key);
-
+class NewScreen extends StatefulWidget {
+  const NewScreen({Key? key, required this.isar}) : super(key: key);
+  final Isar isar;
   @override
-  State<PopularScreen> createState() => _PopularScreenState();
+  State<NewScreen> createState() => _NewScreenState();
 }
 
-class _PopularScreenState extends State<PopularScreen> {
+class _NewScreenState extends State<NewScreen> {
   static const _pageSize = 40;
 
-  final _pagingController = PagingController<int, LibComic>(
+  late final _pagingController = PagingController<int, LibComic>(
     firstPageKey: 1,
   );
 
@@ -226,7 +226,17 @@ class _PopularScreenState extends State<PopularScreen> {
                     onTap: () {
                       Navigator.of(context)
                           .push(MaterialPageRoute(builder: (childContext) {
-                        return ComicPage(comic: item, hid: item.hid);
+                        return ComicPage(
+                          id: item.mdComics.id,
+                          title: item.mdComics.title,
+                          hid: item.hid,
+                          slug: item.mdComics.slug,
+                          chap: item.chap ?? '',
+                          cvUrl: (item.mdComics.mdCovers[0].gpurl != null)
+                              ? "${item.mdComics.mdCovers[0].gpurl}.256.jpg"
+                              : 'https://meo.comick.pictures/${item.mdComics.mdCovers[0].b2Key}',
+                          isar: widget.isar,
+                        );
                       }));
                     },
                     child: ComicListItem(

@@ -57,10 +57,10 @@ class _ReadPageState extends State<ReadPage> {
                               // child: Image.network(
                               //     'https://meo.comick.pictures/${detailsComic.first.chapter.mdImages[index].b2Key}'),
                               CachedNetworkImage(
-                            filterQuality: FilterQuality.high,
+                            filterQuality: FilterQuality.medium,
                             fit: BoxFit.fitWidth,
                             maxWidthDiskCache:
-                                (MediaQuery.of(context).size.width / (0.6))
+                                (MediaQuery.of(context).size.width * 0.98)
                                     .toInt(),
                             imageUrl:
                                 'https://meo.comick.pictures/${detailsComic.first.chapter.mdImages[index].b2Key}',

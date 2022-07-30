@@ -15,8 +15,8 @@ import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'models/entity/chread_entity.dart';
 import 'models/entity/comic_entity.dart';
+import 'models/entity/history_entity.dart';
 import 'models/entity/library_entity.dart';
-import 'models/entity/recent_entity.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -68,7 +68,7 @@ final _entities = <ModelEntity>[
       relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[
         ModelBacklink(
-            name: 'historys', srcEntity: 'ChReadEntity', srcField: 'comic')
+            name: 'chreads', srcEntity: 'ChReadEntity', srcField: 'comic')
       ]),
   ModelEntity(
       id: const IdUid(3, 5557962613499310370),
@@ -88,27 +88,6 @@ final _entities = <ModelEntity>[
             flags: 520,
             indexId: const IdUid(3, 6188511435489046797),
             relationTarget: 'ComicEntity')
-      ],
-      relations: <ModelRelation>[],
-      backlinks: <ModelBacklink>[]),
-  ModelEntity(
-      id: const IdUid(4, 5417380158934321732),
-      name: 'RecentEntity',
-      lastPropertyId: const IdUid(2, 7268052615165744082),
-      flags: 0,
-      properties: <ModelProperty>[
-        ModelProperty(
-            id: const IdUid(1, 8134039504129847663),
-            name: 'id',
-            type: 6,
-            flags: 129),
-        ModelProperty(
-            id: const IdUid(2, 7268052615165744082),
-            name: 'historyId',
-            type: 11,
-            flags: 520,
-            indexId: const IdUid(4, 5938065525604754924),
-            relationTarget: 'ChReadEntity')
       ],
       relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[]),
@@ -162,6 +141,27 @@ final _entities = <ModelEntity>[
             relationTarget: 'ComicEntity')
       ],
       relations: <ModelRelation>[],
+      backlinks: <ModelBacklink>[]),
+  ModelEntity(
+      id: const IdUid(7, 3111101187152023855),
+      name: 'HistoryEntity',
+      lastPropertyId: const IdUid(2, 1672625932898292149),
+      flags: 0,
+      properties: <ModelProperty>[
+        ModelProperty(
+            id: const IdUid(1, 2248344468843422189),
+            name: 'id',
+            type: 6,
+            flags: 129),
+        ModelProperty(
+            id: const IdUid(2, 1672625932898292149),
+            name: 'historyId',
+            type: 11,
+            flags: 520,
+            indexId: const IdUid(7, 6635289824232611684),
+            relationTarget: 'ChReadEntity')
+      ],
+      relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[])
 ];
 
@@ -185,11 +185,15 @@ Future<Store> openStore(
 ModelDefinition getObjectBoxModel() {
   final model = ModelInfo(
       entities: _entities,
-      lastEntityId: const IdUid(5, 1755330369342083268),
-      lastIndexId: const IdUid(5, 6524296489003156183),
+      lastEntityId: const IdUid(7, 3111101187152023855),
+      lastIndexId: const IdUid(7, 6635289824232611684),
       lastRelationId: const IdUid(0, 0),
       lastSequenceId: const IdUid(0, 0),
-      retiredEntityUids: const [2093866077128426254],
+      retiredEntityUids: const [
+        2093866077128426254,
+        5417380158934321732,
+        1911418379135605299
+      ],
       retiredIndexUids: const [],
       retiredPropertyUids: const [
         5711774206955703075,
@@ -206,7 +210,11 @@ ModelDefinition getObjectBoxModel() {
         5528885779401389485,
         6337685752370541484,
         7605252326520422893,
-        7511877158699179014
+        7511877158699179014,
+        8134039504129847663,
+        7268052615165744082,
+        5620837036878221201,
+        3651070960544760583
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -219,7 +227,7 @@ ModelDefinition getObjectBoxModel() {
         toOneRelations: (ComicEntity object) => [object.comics],
         toManyRelations: (ComicEntity object) => {
               RelInfo<ChReadEntity>.toOneBacklink(8, object.id,
-                  (ChReadEntity srcObject) => srcObject.comic): object.historys
+                  (ChReadEntity srcObject) => srcObject.comic): object.chreads
             },
         getId: (ComicEntity object) => object.id,
         setId: (ComicEntity object, int id) {
@@ -262,7 +270,7 @@ ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0);
           object.comics.attach(store);
           InternalToManyAccess.setRelInfo(
-              object.historys,
+              object.chreads,
               store,
               RelInfo<ChReadEntity>.toOneBacklink(
                   8, object.id, (ChReadEntity srcObject) => srcObject.comic),
@@ -295,34 +303,8 @@ ModelDefinition getObjectBoxModel() {
           object.comic.attach(store);
           return object;
         }),
-    RecentEntity: EntityDefinition<RecentEntity>(
-        model: _entities[2],
-        toOneRelations: (RecentEntity object) => [object.history],
-        toManyRelations: (RecentEntity object) => {},
-        getId: (RecentEntity object) => object.id,
-        setId: (RecentEntity object, int id) {
-          object.id = id;
-        },
-        objectToFB: (RecentEntity object, fb.Builder fbb) {
-          fbb.startTable(3);
-          fbb.addInt64(0, object.id);
-          fbb.addInt64(1, object.history.targetId);
-          fbb.finish(fbb.endTable());
-          return object.id;
-        },
-        objectFromFB: (Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-
-          final object = RecentEntity(
-              id: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
-          object.history.targetId =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
-          object.history.attach(store);
-          return object;
-        }),
     ChReadEntity: EntityDefinition<ChReadEntity>(
-        model: _entities[3],
+        model: _entities[2],
         toOneRelations: (ChReadEntity object) => [object.comic],
         toManyRelations: (ChReadEntity object) => {},
         getId: (ChReadEntity object) => object.id,
@@ -367,6 +349,32 @@ ModelDefinition getObjectBoxModel() {
           object.comic.targetId =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0);
           object.comic.attach(store);
+          return object;
+        }),
+    HistoryEntity: EntityDefinition<HistoryEntity>(
+        model: _entities[3],
+        toOneRelations: (HistoryEntity object) => [object.history],
+        toManyRelations: (HistoryEntity object) => {},
+        getId: (HistoryEntity object) => object.id,
+        setId: (HistoryEntity object, int id) {
+          object.id = id;
+        },
+        objectToFB: (HistoryEntity object, fb.Builder fbb) {
+          fbb.startTable(3);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(1, object.history.targetId);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+
+          final object = HistoryEntity(
+              id: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
+          object.history.targetId =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          object.history.attach(store);
           return object;
         })
   };
@@ -416,48 +424,48 @@ class LibraryEntity_ {
       _entities[1].properties[1]);
 }
 
-/// [RecentEntity] entity fields to define ObjectBox queries.
-class RecentEntity_ {
-  /// see [RecentEntity.id]
-  static final id =
-      QueryIntegerProperty<RecentEntity>(_entities[2].properties[0]);
-
-  /// see [RecentEntity.history]
-  static final history = QueryRelationToOne<RecentEntity, ChReadEntity>(
-      _entities[2].properties[1]);
-}
-
 /// [ChReadEntity] entity fields to define ObjectBox queries.
 class ChReadEntity_ {
   /// see [ChReadEntity.id]
   static final id =
-      QueryIntegerProperty<ChReadEntity>(_entities[3].properties[0]);
+      QueryIntegerProperty<ChReadEntity>(_entities[2].properties[0]);
 
   /// see [ChReadEntity.hid]
   static final hid =
-      QueryStringProperty<ChReadEntity>(_entities[3].properties[1]);
+      QueryStringProperty<ChReadEntity>(_entities[2].properties[1]);
 
   /// see [ChReadEntity.comic_id]
   static final comic_id =
-      QueryIntegerProperty<ChReadEntity>(_entities[3].properties[2]);
+      QueryIntegerProperty<ChReadEntity>(_entities[2].properties[2]);
 
   /// see [ChReadEntity.comic_hid]
   static final comic_hid =
-      QueryStringProperty<ChReadEntity>(_entities[3].properties[3]);
+      QueryStringProperty<ChReadEntity>(_entities[2].properties[3]);
 
   /// see [ChReadEntity.ch_num]
   static final ch_num =
-      QueryStringProperty<ChReadEntity>(_entities[3].properties[4]);
+      QueryStringProperty<ChReadEntity>(_entities[2].properties[4]);
 
   /// see [ChReadEntity.ch_title]
   static final ch_title =
-      QueryStringProperty<ChReadEntity>(_entities[3].properties[5]);
+      QueryStringProperty<ChReadEntity>(_entities[2].properties[5]);
 
   /// see [ChReadEntity.lastRead]
   static final lastRead =
-      QueryIntegerProperty<ChReadEntity>(_entities[3].properties[6]);
+      QueryIntegerProperty<ChReadEntity>(_entities[2].properties[6]);
 
   /// see [ChReadEntity.comic]
   static final comic =
-      QueryRelationToOne<ChReadEntity, ComicEntity>(_entities[3].properties[7]);
+      QueryRelationToOne<ChReadEntity, ComicEntity>(_entities[2].properties[7]);
+}
+
+/// [HistoryEntity] entity fields to define ObjectBox queries.
+class HistoryEntity_ {
+  /// see [HistoryEntity.id]
+  static final id =
+      QueryIntegerProperty<HistoryEntity>(_entities[3].properties[0]);
+
+  /// see [HistoryEntity.history]
+  static final history = QueryRelationToOne<HistoryEntity, ChReadEntity>(
+      _entities[3].properties[1]);
 }

@@ -73,28 +73,6 @@
       "relations": []
     },
     {
-      "id": "4:5417380158934321732",
-      "lastPropertyId": "2:7268052615165744082",
-      "name": "RecentEntity",
-      "properties": [
-        {
-          "id": "1:8134039504129847663",
-          "name": "id",
-          "type": 6,
-          "flags": 129
-        },
-        {
-          "id": "2:7268052615165744082",
-          "name": "historyId",
-          "type": 11,
-          "flags": 520,
-          "indexId": "4:5938065525604754924",
-          "relationTarget": "ChReadEntity"
-        }
-      ],
-      "relations": []
-    },
-    {
       "id": "5:1755330369342083268",
       "lastPropertyId": "8:6572059197953696482",
       "name": "ChReadEntity",
@@ -145,16 +123,40 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "7:3111101187152023855",
+      "lastPropertyId": "2:1672625932898292149",
+      "name": "HistoryEntity",
+      "properties": [
+        {
+          "id": "1:2248344468843422189",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:1672625932898292149",
+          "name": "historyId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "7:6635289824232611684",
+          "relationTarget": "ChReadEntity"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "5:1755330369342083268",
-  "lastIndexId": "5:6524296489003156183",
+  "lastEntityId": "7:3111101187152023855",
+  "lastIndexId": "7:6635289824232611684",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [
-    2093866077128426254
+    2093866077128426254,
+    5417380158934321732,
+    1911418379135605299
   ],
   "retiredIndexUids": [],
   "retiredPropertyUids": [
@@ -172,7 +174,11 @@
     5528885779401389485,
     6337685752370541484,
     7605252326520422893,
-    7511877158699179014
+    7511877158699179014,
+    8134039504129847663,
+    7268052615165744082,
+    5620837036878221201,
+    3651070960544760583
   ],
   "retiredRelationUids": [],
   "version": 1

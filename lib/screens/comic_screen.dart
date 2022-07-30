@@ -10,6 +10,7 @@ import 'package:komik_flutter/models/descslug_comic.dart';
 import 'package:komik_flutter/models/details_comic.dart';
 import 'package:komik_flutter/models/entity/comic_entity.dart';
 import 'package:komik_flutter/models/entity/chread_entity.dart';
+import 'package:komik_flutter/models/entity/library_entity.dart';
 import 'package:komik_flutter/models/lchap_comic.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,7 +45,8 @@ class _ComicPageState extends ConsumerState<ComicPage> {
   List<ComicDescSlug> descComic = <ComicDescSlug>[];
   List<String> readed_chap = [];
   Box<ComicEntity> comicBox = objectBox.store.box<ComicEntity>();
-  Box<ChReadEntity> historyBox = objectBox.store.box<ChReadEntity>();
+  Box<ChReadEntity> chReadBox = objectBox.store.box<ChReadEntity>();
+  Box<LibraryEntity> libraryBox = objectBox.store.box<LibraryEntity>();
   bool isBookmarked = false;
 
   @override
@@ -398,7 +400,7 @@ class _ComicPageState extends ConsumerState<ComicPage> {
   }
 
   _checkLibrary() async {
-    final getComic = comicBox.get(widget.id);
+    final getComic = libraryBox.get(widget.id);
     if (getComic != null) {
       print(getComic.toString());
       setState(() {

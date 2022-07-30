@@ -13,7 +13,7 @@ class ComicEntity {
   late String cvUrl;
 
   @Backlink('comic')
-  late final historys = ToMany<ChReadEntity>();
+  late final chreads = ToMany<ChReadEntity>();
 
   late final comics = ToOne<LibraryEntity>();
 

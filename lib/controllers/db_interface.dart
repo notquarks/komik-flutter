@@ -1,7 +1,7 @@
 import 'package:komik_flutter/models/entity/comic_entity.dart';
 import 'package:komik_flutter/models/entity/chread_entity.dart';
 import 'package:komik_flutter/models/entity/library_entity.dart';
-import 'package:komik_flutter/models/entity/recent_entity.dart';
+import 'package:komik_flutter/models/entity/history_entity.dart';
 import 'package:komik_flutter/objectbox.g.dart';
 import 'package:objectbox/objectbox.dart';
 
@@ -9,13 +9,13 @@ class ObjectBox {
   late final Store store;
   late final Box<ComicEntity> comicBox;
   late final Box<ChReadEntity> chReadBox;
-  late final Box<RecentEntity> recentBox;
+  late final Box<HistoryEntity> historyBox;
   late final Box<LibraryEntity> libraryBox;
 
   ObjectBox._create(this.store) {
     comicBox = Box<ComicEntity>(store);
     chReadBox = Box<ChReadEntity>(store);
-    recentBox = Box<RecentEntity>(store);
+    historyBox = Box<HistoryEntity>(store);
     libraryBox = Box<LibraryEntity>(store);
   }
 
@@ -51,7 +51,7 @@ class ObjectBox {
   addToHistory(int id, int comic_id, String hid, String comic_hid,
       String ch_title, String ch_num) {
     final getChRead = chReadBox.get(id);
-    final getRecentHistory = recentBox.get(id);
+    final getRecentHistory = historyBox.get(id);
     if (getChRead == null) {
       ChReadEntity addHistory = ChReadEntity(
           id: id,
@@ -64,19 +64,22 @@ class ObjectBox {
       final comic = comicBox.get(comic_id);
       addHistory.comic.target = comic;
       chReadBox.put(addHistory);
+    } else {
+      getChRead.lastRead = DateTime.now();
+      chReadBox.put(getChRead);
     }
     if (getRecentHistory == null) {
-      RecentEntity addRecentHistory = RecentEntity(id: comic_id);
+      HistoryEntity addRecentHistory = HistoryEntity(id: comic_id);
       addRecentHistory.history.target = chReadBox.get(id);
-      recentBox.put(addRecentHistory);
+      historyBox.put(addRecentHistory);
     } else {
-      final getRecent = recentBox.get(comic_id);
+      final getRecent = historyBox.get(comic_id);
       getRecent!.history.target = chReadBox.get(id);
-      recentBox.put(getRecent);
+      historyBox.put(getRecent);
     }
   }
 
   deleteAllHistory() {
-    recentBox.removeAll();
+    historyBox.removeAll();
   }
 }

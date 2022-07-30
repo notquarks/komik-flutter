@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:komik_flutter/controllers/db_interface.dart';
 import 'package:komik_flutter/models/entity/comic_entity.dart';
-import 'package:komik_flutter/models/entity/recent_entity.dart';
+import 'package:komik_flutter/models/entity/history_entity.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:komik_flutter/collections/history_col.dart';
 import 'package:komik_flutter/main.dart';
@@ -19,9 +19,9 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   final comicBox = objectBox.store.box<ComicEntity>();
-  final historyBox = objectBox.store.box<RecentEntity>();
+  final historyBox = objectBox.store.box<HistoryEntity>();
 
-  Stream<List<RecentEntity>> _fetchRecentHistory() {
+  Stream<List<HistoryEntity>> _fetchRecentHistory() {
     return historyBox
         .query()
         .watch(triggerImmediately: true)
@@ -55,7 +55,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: SafeArea(
               top: false,
               minimum: EdgeInsets.symmetric(horizontal: 6),
-              child: StreamBuilder<List<RecentEntity>>(
+              child: StreamBuilder<List<HistoryEntity>>(
                   stream: _fetchRecentHistory(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
@@ -71,8 +71,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             print('Print comic box: ${comicBox.count()}');
                             final history = historys[index];
                             // final comic = history.comic.target!.historys.last;
-                            print(history.history.target!.ch_title);
-                            print(history.history.target!.comic.target!.title);
+                            // print(history.history.target!.ch_title);
+                            // print(history.history.target!.comic.target!.title);
                             return Card(
                               child: ListTile(
                                 title: Text(history

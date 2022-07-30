@@ -1,41 +1,56 @@
 import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
 import 'package:komik_flutter/collections/comic_col.dart';
 import 'package:komik_flutter/components/comic_item.dart';
+import 'package:komik_flutter/main.dart';
+import 'package:komik_flutter/models/descslug_comic.dart';
+import 'package:komik_flutter/models/entity/comic_entity.dart';
+import 'package:komik_flutter/models/entity/library_entity.dart';
+import 'package:komik_flutter/objectbox.g.dart';
 import 'package:komik_flutter/screens/comic_screen.dart';
 import 'package:komik_flutter/screens/settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key, required this.isar}) : super(key: key);
-  final Isar isar;
+  const HomeScreen({Key? key}) : super(key: key);
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isSearching = false;
-  List<ComicCol> comics = [];
-  Stream<List<ComicCol>> execQuery() {
-    if (!isSearching) {
-      _readComicCol(widget.isar);
-    }
-    return widget.isar.comicCols
-        .where()
-        .limit(1)
-        .build()
-        .watch(initialReturn: true);
+  late Stream<List<ComicEntity>> streamComics;
+  // Box<ComicEntity> comicBox = objectBox.store.box<ComicEntity>();
+  Box<LibraryEntity> libraryEntity = objectBox.store.box<LibraryEntity>();
+  // Stream<List<ComicEntity>> execQuery() {
+  //   if (!isSearching) {
+  //     _readComicCol(widget.isar);
+  //   }
+  //   return widget.isar.comicCols
+  //       .where()
+  //       .limit(1)
+  //       .build()
+  //       .watch(initialReturn: true);
+  // }
+
+  Stream<List<LibraryEntity>> _fetchFavComic() {
+    return libraryEntity
+        .query()
+        .watch(triggerImmediately: true)
+        .map((event) => event.find());
   }
 
   @override
   void initState() {
-    _readComicCol(widget.isar);
+    // comicBox = objectBox.store.box<ComicEntity>();
+    _fetchFavComic();
     // TODO: implement initState
     super.initState();
   }
 
   @override
   void dispose() {
+    // objectBox.store.close();
     super.dispose();
   }
 
@@ -66,8 +81,8 @@ class _HomeScreenState extends State<HomeScreen> {
             body: SafeArea(
               minimum: const EdgeInsets.symmetric(horizontal: 8),
               child: StreamBuilder(
-                stream: execQuery(),
-                builder: (context, AsyncSnapshot<List<ComicCol?>> data) {
+                stream: _fetchFavComic(),
+                builder: (context, AsyncSnapshot<List<LibraryEntity>> data) {
                   if (data.hasData) {
                     if (data.data!.isEmpty) {
                       return const Align(
@@ -75,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text('Nothing to display'),
                       );
                     } else {
+                      final comics = data.data!;
                       return GridView.builder(
                         itemCount: comics.length,
                         gridDelegate:
@@ -89,18 +105,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.of(context).push(
                                 MaterialPageRoute(builder: (childContext) {
                               return ComicPage(
-                                isar: widget.isar,
                                 id: comics[index].id,
-                                title: comics[index].title,
-                                hid: comics[index].hid,
-                                slug: comics[index].slug,
-                                chap: comics[index].chap,
-                                cvUrl: comics[index].cvUrl,
+                                title: comics[index].comic.target!.title,
+                                hid: comics[index].comic.target!.hid,
+                                slug: comics[index].comic.target!.slug,
+                                chap: comics[index].comic.target!.chap,
+                                cvUrl: comics[index].comic.target!.cvUrl,
                               );
                             }));
                           },
                           child: ComicListItem3(
-                            comic: comics[index],
+                            comic: comics[index].comic.target!,
                           ),
                         ),
                       );
@@ -113,19 +128,12 @@ class _HomeScreenState extends State<HomeScreen> {
             )));
   }
 
-  Widget headerWidget() {
-    return Container(
-      child: Text('Helloo World'),
-    );
-  }
-
-  _readComicCol(Isar isar) async {
-    final comicCollection = isar.comicCols;
-    final getComic = await comicCollection.where().findAll();
-    if (mounted) {
-      setState(() {
-        comics = getComic;
-      });
-    }
-  }
+  // _readComicCol() async {
+  //   final getComic = comicBox!.getAll();
+  //   if (mounted) {
+  //     setState(() {
+  //       comics = getComic;
+  //     });
+  //   }
+  // }
 }

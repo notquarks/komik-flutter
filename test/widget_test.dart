@@ -7,7 +7,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:isar/isar.dart';
 import 'package:komik_flutter/collections/comic_col.dart';
 import 'package:komik_flutter/collections/history_col.dart';
 
@@ -17,15 +16,9 @@ import 'package:path_provider/path_provider.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     final dir = await getApplicationSupportDirectory();
-    final isar = await Isar.open(
-      inspector: true,
-      schemas: [ComicColSchema, HistorySchema],
-      directory: dir.path,
-    );
+
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp(
-      isar: isar,
-    ));
+    await tester.pumpWidget(MyApp());
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

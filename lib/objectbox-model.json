@@ -1,0 +1,185 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:572276110520249480",
+      "lastPropertyId": "7:4518916374952017025",
+      "name": "ComicEntity",
+      "properties": [
+        {
+          "id": "1:6059118532655011869",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:1872177001266930912",
+          "name": "hid",
+          "type": 9
+        },
+        {
+          "id": "3:6857381106056183410",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "4:2209322196750800859",
+          "name": "slug",
+          "type": 9
+        },
+        {
+          "id": "5:6809023579075812042",
+          "name": "chap",
+          "type": 9
+        },
+        {
+          "id": "6:5071461967351139467",
+          "name": "cvUrl",
+          "type": 9
+        },
+        {
+          "id": "7:4518916374952017025",
+          "name": "comicsId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "2:2590358157654627052",
+          "relationTarget": "LibraryEntity"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:5557962613499310370",
+      "lastPropertyId": "2:2296936803066592906",
+      "name": "LibraryEntity",
+      "properties": [
+        {
+          "id": "1:6726811471902149395",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:2296936803066592906",
+          "name": "comicId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "3:6188511435489046797",
+          "relationTarget": "ComicEntity"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:1755330369342083268",
+      "lastPropertyId": "8:6572059197953696482",
+      "name": "ChReadEntity",
+      "properties": [
+        {
+          "id": "1:257972397042005021",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:1736158061589199752",
+          "name": "hid",
+          "type": 9
+        },
+        {
+          "id": "3:2721163798200270488",
+          "name": "comic_id",
+          "type": 6
+        },
+        {
+          "id": "4:7866686949582474494",
+          "name": "comic_hid",
+          "type": 9
+        },
+        {
+          "id": "5:6918321489032666226",
+          "name": "ch_num",
+          "type": 9
+        },
+        {
+          "id": "6:8762116438526885456",
+          "name": "ch_title",
+          "type": 9
+        },
+        {
+          "id": "7:3125758226194398658",
+          "name": "lastRead",
+          "type": 10
+        },
+        {
+          "id": "8:6572059197953696482",
+          "name": "comicId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "5:6524296489003156183",
+          "relationTarget": "ComicEntity"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "7:3111101187152023855",
+      "lastPropertyId": "2:1672625932898292149",
+      "name": "HistoryEntity",
+      "properties": [
+        {
+          "id": "1:2248344468843422189",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:1672625932898292149",
+          "name": "historyId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "7:6635289824232611684",
+          "relationTarget": "ChReadEntity"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "7:3111101187152023855",
+  "lastIndexId": "7:6635289824232611684",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [
+    2093866077128426254,
+    5417380158934321732,
+    1911418379135605299
+  ],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    5711774206955703075,
+    7285190785375772113,
+    1961647398539106913,
+    2203206497137318833,
+    5130188229467115087,
+    3741819855319900965,
+    238091739546673308,
+    8427720212109435031,
+    394394602538038633,
+    6634345048189603765,
+    8278537964541304612,
+    5528885779401389485,
+    6337685752370541484,
+    7605252326520422893,
+    7511877158699179014,
+    8134039504129847663,
+    7268052615165744082,
+    5620837036878221201,
+    3651070960544760583
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}

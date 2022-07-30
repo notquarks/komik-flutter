@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
+
 import 'package:komik_flutter/components/comic_item.dart';
 import 'package:komik_flutter/controllers/fetch_comick.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
@@ -10,8 +10,8 @@ import 'package:komik_flutter/screens/comic_screen.dart';
 import 'package:komik_flutter/screens/settings_screen.dart';
 
 class BrowseScreen extends StatelessWidget {
-  const BrowseScreen({Key? key, required this.isar}) : super(key: key);
-  final Isar isar;
+  const BrowseScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -42,8 +42,8 @@ class BrowseScreen extends StatelessWidget {
             ];
           },
           body: TabBarView(children: [
-            TopScreen(isar: isar),
-            NewScreen(isar: isar),
+            TopScreen(),
+            NewScreen(),
           ]),
         ),
       ),
@@ -52,8 +52,8 @@ class BrowseScreen extends StatelessWidget {
 }
 
 class TopScreen extends StatefulWidget {
-  TopScreen({Key? key, required this.isar}) : super(key: key);
-  final Isar isar;
+  TopScreen({Key? key}) : super(key: key);
+
   @override
   State<TopScreen> createState() => _TopScreenState();
 }
@@ -129,7 +129,12 @@ class _TopScreenState extends State<TopScreen> {
                     onTap: () {
                       Navigator.of(context)
                           .push(MaterialPageRoute(builder: (childContext) {
-                        return ComicPage2(comic: item, slug: item.slug);
+                        return ComicPage2(
+                            comic: item,
+                            slug: item.slug,
+                            cvUrl: (item.mdCovers[0].gpurl != null)
+                                ? "${item.mdCovers[0].gpurl}.256.jpg"
+                                : 'https://meo.comick.pictures/${item.mdCovers[0].b2Key}');
                       }));
                     },
                     child: ComicListItem2(
@@ -147,8 +152,8 @@ class _TopScreenState extends State<TopScreen> {
 }
 
 class NewScreen extends StatefulWidget {
-  const NewScreen({Key? key, required this.isar}) : super(key: key);
-  final Isar isar;
+  const NewScreen({Key? key}) : super(key: key);
+
   @override
   State<NewScreen> createState() => _NewScreenState();
 }
@@ -202,13 +207,6 @@ class _NewScreenState extends State<NewScreen> {
         ),
         child: CustomScrollView(
           slivers: [
-            // SliverAppBar(
-            //   title: Text('Browse'),
-            //   floating: true,
-            //   snap: true,
-            //   pinned: false,
-            //   actions: [IconButton(onPressed: () {}, icon: Icon(Icons.sort))],
-            // ),
             SliverSafeArea(
               bottom: false,
               minimum: const EdgeInsets.symmetric(horizontal: 8),
@@ -235,7 +233,6 @@ class _NewScreenState extends State<NewScreen> {
                           cvUrl: (item.mdComics.mdCovers[0].gpurl != null)
                               ? "${item.mdComics.mdCovers[0].gpurl}.256.jpg"
                               : 'https://meo.comick.pictures/${item.mdComics.mdCovers[0].b2Key}',
-                          isar: widget.isar,
                         );
                       }));
                     },

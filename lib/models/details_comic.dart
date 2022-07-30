@@ -70,7 +70,6 @@ class DetailsComic {
             List<dynamic>.from(chapterLangList.map((x) => x.toJson())),
         "canonical": canonical,
         "seoTitle": seoTitle,
-        "seoDescription": seoDescription,
         "chapTitle": chapTitle,
         "checkVol2Chap1": checkVol2Chap1,
       };
@@ -388,7 +387,7 @@ class Next {
   });
 
   int? id;
-  String? hid;
+  String hid;
   dynamic vol;
   String? title;
   String? chap;

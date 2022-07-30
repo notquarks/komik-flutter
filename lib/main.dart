@@ -1,8 +1,8 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
 import 'package:komik_flutter/collections/comic_col.dart';
 import 'package:komik_flutter/collections/history_col.dart';
+import 'package:komik_flutter/controllers/db_interface.dart';
 import 'package:komik_flutter/screens/browse_screen.dart';
 import 'package:komik_flutter/screens/history_screen.dart';
 import 'package:komik_flutter/screens/library_screen.dart';
@@ -10,22 +10,19 @@ import 'package:path_provider/path_provider.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+late ObjectBox objectBox;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final dir = await getApplicationSupportDirectory();
-  final isar = await Isar.open(
-    inspector: true,
-    schemas: [ComicColSchema, HistorySchema],
-    directory: dir.path,
-  );
+  // final dir = await getApplicationSupportDirectory();
+  objectBox = await ObjectBox.create();
   runApp(
-    ProviderScope(child: MyApp(isar: isar)),
+    const ProviderScope(child: MyApp()),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key, required this.isar}) : super(key: key);
-  final Isar isar;
+  const MyApp({Key? key}) : super(key: key);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -54,14 +51,14 @@ class MyApp extends StatelessWidget {
         ),
         visualDensity: FlexColorScheme.comfortablePlatformDensity,
       ),
-      home: BottomNavBar(isar: isar),
+      home: const BottomNavBar(),
     );
   }
 }
 
 class BottomNavBar extends StatefulWidget {
-  const BottomNavBar({Key? key, required this.isar}) : super(key: key);
-  final Isar isar;
+  const BottomNavBar({Key? key}) : super(key: key);
+
   @override
   State<BottomNavBar> createState() => _BottomNavBarState();
 }
@@ -83,22 +80,16 @@ class _BottomNavBarState extends State<BottomNavBar> {
   Widget getPage(int index) {
     switch (index) {
       case 0:
-        return HomeScreen(
-          isar: widget.isar,
-        );
+        return const HomeScreen();
         break;
       case 1:
-        return BrowseScreen(isar: widget.isar);
+        return const BrowseScreen();
         break;
       case 2:
-        return HistoryScreen(
-          isar: widget.isar,
-        );
+        return const HistoryScreen();
         break;
       default:
-        return HomeScreen(
-          isar: widget.isar,
-        );
+        return const HomeScreen();
         break;
     }
   }

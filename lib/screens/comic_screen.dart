@@ -1,19 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expandable/expandable.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:isar/isar.dart';
-import 'package:komik_flutter/collections/comic_col.dart';
-import 'package:komik_flutter/collections/history_col.dart';
 import 'package:komik_flutter/controllers/fetch_comick.dart';
+import 'package:komik_flutter/main.dart';
 import 'package:komik_flutter/models/descslug_comic.dart';
 import 'package:komik_flutter/models/details_comic.dart';
+import 'package:komik_flutter/models/entity/comic_entity.dart';
+import 'package:komik_flutter/models/entity/chread_entity.dart';
 import 'package:komik_flutter/models/lchap_comic.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:komik_flutter/objectbox.g.dart';
 import 'package:komik_flutter/screens/read_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -24,7 +24,6 @@ class ComicPage extends ConsumerStatefulWidget {
     required this.hid,
     required this.slug,
     required this.title,
-    required this.isar,
     required this.chap,
     required this.cvUrl,
   }) : super(key: key);
@@ -34,7 +33,7 @@ class ComicPage extends ConsumerStatefulWidget {
   String title;
   String chap;
   String cvUrl;
-  Isar isar;
+
   @override
   ConsumerState<ComicPage> createState() => _ComicPageState();
 }
@@ -44,14 +43,18 @@ class _ComicPageState extends ConsumerState<ComicPage> {
   List<ListChapters> chaptersComic = <ListChapters>[];
   List<ComicDescSlug> descComic = <ComicDescSlug>[];
   List<String> readed_chap = [];
-
+  Box<ComicEntity> comicBox = objectBox.store.box<ComicEntity>();
+  Box<ChReadEntity> historyBox = objectBox.store.box<ChReadEntity>();
   bool isBookmarked = false;
 
   @override
   void initState() {
+    _checkLibrary();
+    // objectBox.readHistory(widget.id, readed_chap);
+    print(readed_chap.length);
     _fetchData(widget.hid);
-    _checkLibrary(widget.isar);
-    _readHistory(widget.isar);
+    objectBox.addComic(widget.id, widget.hid, widget.title, widget.slug,
+        widget.chap, widget.cvUrl);
     super.initState();
   }
 
@@ -172,12 +175,21 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                               (isBookmarked)
                                   ? ElevatedButton(
                                       onPressed: () {
-                                        _removeComic(widget.isar);
+                                        objectBox.removeFromLib(widget.id);
+                                        // objectBox.removeComic(widget.id);
                                       },
                                       child: const Text('Remove from Library'))
                                   : ElevatedButton(
                                       onPressed: () {
-                                        _addComic(widget.isar);
+                                        objectBox.addToLib(widget.id);
+                                        // objectBox.addComic(
+                                        //     widget.id,
+                                        //     widget.hid,
+                                        //     widget.title,
+                                        //     widget.slug,
+                                        //     widget.chap,
+                                        //     widget.cvUrl);
+                                        _checkLibrary();
                                       },
                                       child: const Text('Add to Library')),
                               Padding(
@@ -312,6 +324,10 @@ class _ComicPageState extends ConsumerState<ComicPage> {
     );
   }
 
+  /**
+   ** Build all list chapter
+   ** Comic Chapter
+   */
   Widget _listComicChapters(ListChapters comicCh) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
@@ -320,14 +336,26 @@ class _ComicPageState extends ConsumerState<ComicPage> {
           final chTitle = 'Ch. ${comicCh.chapters[index].chap} '
               ' ${comicCh.chapters[index].title ?? ''}';
           return Card(
-            color: const Color.fromARGB(255, 48, 52, 60),
+            // color: const Color.fromARGB(255, 48, 52, 60),
             child: ListTile(
               onTap: () {
-                _addToHistory(
-                    widget.isar,
-                    chTitle,
+                objectBox.addToHistory(
+                    comicCh.chapters[index].id,
+                    widget.id,
                     comicCh.chapters[index].hid.toString(),
-                    comicCh.chapters[index].id);
+                    widget.hid,
+                    chTitle,
+                    comicCh.chapters[index].chap);
+                // objectBox.addToHistory(
+                //     chTitle,
+                //     comicCh.chapters[index].hid.toString(),
+                //     comicCh.chapters[index].id,
+                //     readed_chap,
+                //     widget.id,
+                //     widget.hid,
+                //     widget.title,
+                //     widget.cvUrl,
+                //     widget.slug);
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
                   return ReadPage(
@@ -369,9 +397,8 @@ class _ComicPageState extends ConsumerState<ComicPage> {
             width: 20, height: 20, child: CircularProgressIndicator()));
   }
 
-  _checkLibrary(Isar isar) async {
-    final comicCollection = isar.comicCols;
-    final getComic = await comicCollection.get(widget.id);
+  _checkLibrary() async {
+    final getComic = comicBox.get(widget.id);
     if (getComic != null) {
       print(getComic.toString());
       setState(() {
@@ -382,75 +409,5 @@ class _ComicPageState extends ConsumerState<ComicPage> {
         isBookmarked = false;
       });
     }
-  }
-
-  _readHistory(Isar isar) async {
-    final historyCollection = isar.historys;
-    final getHistory = await historyCollection.getByHid(widget.hid);
-    if (getHistory != null) {
-      if (mounted) {
-        setState(() {
-          readed_chap = getHistory.read;
-        });
-      }
-    }
-  }
-
-  _addToHistory(Isar isar, String chTitle, String hid_chap, int id_chap) async {
-    final historyCollection = isar.historys;
-
-    readed_chap.add(hid_chap);
-    await isar.writeTxn((isar) async {
-      final getComicHistory = await historyCollection.getByHid(widget.hid);
-      print(getComicHistory.toString());
-      if (getComicHistory == null) {
-        final addHistory = History()
-          ..id = widget.id
-          ..hid = hid_chap
-          ..lastRead = DateTime.now()
-          ..chapter_title = chTitle
-          ..title = widget.title
-          ..slug = widget.slug
-          ..ch_id = id_chap
-          ..cvUrl = widget.cvUrl
-          ..read = readed_chap.toSet().toList();
-        await historyCollection.put(addHistory);
-      } else {
-        print('TEst');
-        getComicHistory.ch_id = id_chap;
-        getComicHistory.hid = hid_chap;
-        getComicHistory.chapter_title = chTitle;
-        getComicHistory.lastRead = DateTime.now();
-        getComicHistory.read = readed_chap.toSet().toList();
-        getComicHistory.cvUrl = widget.cvUrl;
-        await historyCollection.put(getComicHistory);
-      }
-    });
-  }
-
-  _addComic(Isar isar) async {
-    final comicCollection = isar.comicCols;
-    final addComic = ComicCol()
-      ..id = widget.id
-      ..hid = widget.hid
-      ..slug = widget.slug
-      ..title = widget.title
-      ..chap = widget.chap
-      ..cvUrl = widget.cvUrl;
-    await isar.writeTxn((isar) async {
-      await comicCollection.put(addComic, saveLinks: true);
-    });
-    _checkLibrary(isar);
-  }
-
-  _removeComic(Isar isar) async {
-    final comicCollection = isar.comicCols;
-    await isar.writeTxn((isar) async {
-      comicCollection.delete(widget.id);
-    });
-    setState(() {
-      isBookmarked = false;
-    });
-    _checkLibrary(isar);
   }
 }

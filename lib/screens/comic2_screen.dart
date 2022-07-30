@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:komik_flutter/controllers/db_interface.dart';
 import 'package:komik_flutter/controllers/fetch_comick.dart';
+import 'package:komik_flutter/main.dart';
 import 'package:komik_flutter/models/descslug_comic.dart';
 import 'package:komik_flutter/models/details_comic.dart';
 import 'package:komik_flutter/models/lchap_comic.dart';
@@ -15,10 +17,12 @@ import 'package:komik_flutter/screens/read_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ComicPage2 extends ConsumerStatefulWidget {
-  ComicPage2({Key? key, required this.comic, required this.slug})
+  ComicPage2(
+      {Key? key, required this.comic, required this.slug, required this.cvUrl})
       : super(key: key);
   Completion comic;
   String slug;
+  String cvUrl;
 
   @override
   ConsumerState<ComicPage2> createState() => _ComicPage2State();
@@ -28,12 +32,21 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
   List<DetailsComic> detailsComic = <DetailsComic>[];
   List<ListChapters> chaptersComic = <ListChapters>[];
   List<ComicDescSlug> descComic = <ComicDescSlug>[];
+  bool isBookmarked = false;
 
   @override
   void initState() {
     _fetchData(widget.slug).then((value) {
-      _fetchData2(descComic.first.comic.id);
+      _fetchData2(descComic.first.comic.id).then((value) async {
+        _checkLibrary(descComic.first.comic.id);
+        var resultDetails = await ComickApi.getComicDetails(
+            chaptersComic.first.chapters.first.hid!);
+        setState(() {
+          detailsComic.addAll(resultDetails);
+        });
+      });
     });
+
     super.initState();
   }
 
@@ -46,7 +59,6 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
 
   Future _fetchData2(int hid) async {
     var resultChapters = await ComickApi.getListChapters(hid);
-
     setState(() {
       chaptersComic.addAll(resultChapters);
     });
@@ -204,9 +216,27 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                         Container(
                           child: Row(
                             children: [
-                              ElevatedButton(
-                                  onPressed: () {},
-                                  child: const Text('Add to Library')),
+                              (isBookmarked)
+                                  ? ElevatedButton(
+                                      onPressed: () {
+                                        objectBox.removeComic(
+                                            descComic.first.comic.id);
+                                        _checkLibrary(descComic.first.comic.id);
+                                      },
+                                      child: const Text('Remove from Library'))
+                                  : ElevatedButton(
+                                      onPressed: () {
+                                        objectBox.addComic(
+                                            descComic.first.comic.id,
+                                            detailsComic.first.chapter.hid,
+                                            widget.comic.title,
+                                            widget.slug,
+                                            chaptersComic.first.total
+                                                .toString(),
+                                            widget.cvUrl);
+                                        _checkLibrary(descComic.first.comic.id);
+                                      },
+                                      child: const Text('Add to Library')),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12.0),
@@ -342,5 +372,19 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
     return const Center(
         child: SizedBox(
             width: 20, height: 20, child: CircularProgressIndicator()));
+  }
+
+  _checkLibrary(int id) async {
+    final getComic = objectBox.comicBox.get(id);
+    if (getComic != null) {
+      print(getComic.toString());
+      setState(() {
+        isBookmarked = true;
+      });
+    } else {
+      setState(() {
+        isBookmarked = false;
+      });
+    }
   }
 }

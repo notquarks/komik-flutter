@@ -4,7 +4,6 @@ import 'package:komik_flutter/controllers/db_interface.dart';
 import 'package:komik_flutter/models/entity/comic_entity.dart';
 import 'package:komik_flutter/models/entity/history_entity.dart';
 import 'package:objectbox/objectbox.dart';
-import 'package:komik_flutter/collections/history_col.dart';
 import 'package:komik_flutter/main.dart';
 import 'package:komik_flutter/models/entity/chread_entity.dart';
 import 'package:komik_flutter/models/entity/library_entity.dart';

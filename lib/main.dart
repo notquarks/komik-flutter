@@ -1,7 +1,5 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:komik_flutter/collections/comic_col.dart';
-import 'package:komik_flutter/collections/history_col.dart';
 import 'package:komik_flutter/controllers/db_interface.dart';
 import 'package:komik_flutter/screens/browse_screen.dart';
 import 'package:komik_flutter/screens/history_screen.dart';

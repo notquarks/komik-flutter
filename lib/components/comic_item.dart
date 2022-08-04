@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:komik_flutter/collections/comic_col.dart';
 import 'package:komik_flutter/models/entity/comic_entity.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:komik_flutter/models/top_comic.dart';

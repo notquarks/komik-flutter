@@ -109,7 +109,9 @@ class _ComicPageState extends ConsumerState<ComicPage> {
           SizedBox(
             height: 255,
             child: Stack(children: [
-              //Background Cover Pic
+              //**
+              //Background Cover Pic Under Gradient
+              // */
               Container(
                 width: 1080,
                 child: Column(
@@ -124,7 +126,7 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                   ],
                 ),
               ),
-              //Background Cover
+              //Background Gradient Cover
               Container(
                 height: 900,
                 decoration: const BoxDecoration(
@@ -147,13 +149,14 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                           height: 5,
                           width: 720,
                         ),
+                        //**Cover Comic */
                         Container(
                             decoration: const BoxDecoration(),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 SizedBox(
-                                  width: 110,
+                                  width: 120,
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(15.0),
                                     child: CachedNetworkImage(
@@ -178,6 +181,7 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                                   ? ElevatedButton(
                                       onPressed: () {
                                         objectBox.removeFromLib(widget.id);
+                                        _checkLibrary();
                                         // objectBox.removeComic(widget.id);
                                       },
                                       child: const Text('Remove from Library'))
@@ -233,6 +237,9 @@ class _ComicPageState extends ConsumerState<ComicPage> {
               ),
             ]),
           ),
+          //**
+          // Comic Description
+          // */
           Container(
             // color: Colors.amber,
             child: SizedBox(
@@ -281,6 +288,9 @@ class _ComicPageState extends ConsumerState<ComicPage> {
     );
   }
 
+  //**
+  // Comic Title
+  // */
   Widget _comicTitleAuthor(ComicDescSlug comicDetails) {
     return SizedBox(
       width: 260,
@@ -299,25 +309,43 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                 maxLines: 4,
                 textAlign: TextAlign.left,
                 style: const TextStyle(
-                    fontSize: 22.0,
+                    fontSize: 20.0,
                     fontWeight: FontWeight.w500,
                     overflow: TextOverflow.ellipsis),
-              ),
-              Text(
-                comicDetails.artists
-                    .map((e) => e.name)
-                    .toString()
-                    .replaceAll(RegExp('[^A-Za-z0-9,]'), ''),
-                softWrap: true,
-                textAlign: TextAlign.left,
               ),
               Text(
                 (comicDetails.comic.status == 1) ? 'Ongoing' : 'Completed',
                 softWrap: true,
                 textAlign: TextAlign.left,
                 style: const TextStyle(
-                  fontSize: 14.0,
+                  fontSize: 13.0,
                 ),
+              ),
+              Row(
+                children: [
+                  for (var artist in comicDetails.artists)
+                    Text(
+                      '${artist.name} ',
+                      softWrap: true,
+                      textAlign: TextAlign.left,
+                      style: const TextStyle(
+                        fontSize: 13,
+                      ),
+                    ),
+                ],
+              ),
+              Row(
+                children: [
+                  for (var author in comicDetails.artists)
+                    Text(
+                      '${author.name} ',
+                      softWrap: true,
+                      textAlign: TextAlign.left,
+                      style: const TextStyle(
+                        fontSize: 13,
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
@@ -341,6 +369,9 @@ class _ComicPageState extends ConsumerState<ComicPage> {
             // color: const Color.fromARGB(255, 48, 52, 60),
             child: ListTile(
               onTap: () {
+                //**
+                // Open History and add to db
+                // */
                 objectBox.addToHistory(
                     comicCh.chapters[index].id,
                     widget.id,

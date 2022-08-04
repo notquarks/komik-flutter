@@ -44,6 +44,13 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
         setState(() {
           detailsComic.addAll(resultDetails);
         });
+        objectBox.addComic(
+            descComic.first.comic.id,
+            detailsComic.first.chapter.hid,
+            widget.comic.title,
+            widget.slug,
+            chaptersComic.first.total.toString(),
+            widget.cvUrl);
       });
     });
 
@@ -179,20 +186,10 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                                                 maxLines: 4,
                                                 textAlign: TextAlign.left,
                                                 style: const TextStyle(
-                                                    fontSize: 22.0,
+                                                    fontSize: 20.0,
                                                     fontWeight: FontWeight.w500,
                                                     overflow:
                                                         TextOverflow.ellipsis),
-                                              ),
-                                              Text(
-                                                comicDetails.artists
-                                                    .map((e) => e.name)
-                                                    .toString()
-                                                    .replaceAll(
-                                                        RegExp('[^A-Za-z0-9,]'),
-                                                        ''),
-                                                softWrap: true,
-                                                textAlign: TextAlign.left,
                                               ),
                                               Text(
                                                 (comicDetails.comic.status == 1)
@@ -201,8 +198,36 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                                                 softWrap: true,
                                                 textAlign: TextAlign.left,
                                                 style: const TextStyle(
-                                                  fontSize: 14.0,
+                                                  fontSize: 13,
                                                 ),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  for (var artist
+                                                      in comicDetails.artists)
+                                                    Text(
+                                                      '${artist.name} ',
+                                                      softWrap: true,
+                                                      textAlign: TextAlign.left,
+                                                      style: const TextStyle(
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  for (var author
+                                                      in comicDetails.artists)
+                                                    Text(
+                                                      '${author.name} ',
+                                                      softWrap: true,
+                                                      textAlign: TextAlign.left,
+                                                      style: const TextStyle(
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                ],
                                               ),
                                             ],
                                           ),
@@ -219,21 +244,23 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                               (isBookmarked)
                                   ? ElevatedButton(
                                       onPressed: () {
-                                        objectBox.removeComic(
+                                        objectBox.removeFromLib(
                                             descComic.first.comic.id);
                                         _checkLibrary(descComic.first.comic.id);
                                       },
                                       child: const Text('Remove from Library'))
                                   : ElevatedButton(
                                       onPressed: () {
-                                        objectBox.addComic(
-                                            descComic.first.comic.id,
-                                            detailsComic.first.chapter.hid,
-                                            widget.comic.title,
-                                            widget.slug,
-                                            chaptersComic.first.total
-                                                .toString(),
-                                            widget.cvUrl);
+                                        objectBox
+                                            .addToLib(descComic.first.comic.id);
+                                        // objectBox.addComic(
+                                        //     descComic.first.comic.id,
+                                        //     detailsComic.first.chapter.hid,
+                                        //     widget.comic.title,
+                                        //     widget.slug,
+                                        //     chaptersComic.first.total
+                                        //         .toString(),
+                                        //     widget.cvUrl);
                                         _checkLibrary(descComic.first.comic.id);
                                       },
                                       child: const Text('Add to Library')),
@@ -329,10 +356,19 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
       delegate: SliverChildBuilderDelegate(
         childCount: comicCh.chapters.length,
         ((context, index) {
+          final chTitle = 'Ch. ${comicCh.chapters[index].chap} '
+              ' ${comicCh.chapters[index].title ?? ''}';
           return Card(
             color: const Color.fromARGB(255, 48, 52, 60),
             child: ListTile(
               onTap: () {
+                objectBox.addToHistory(
+                    comicCh.chapters[index].id,
+                    descComic.first.comic.id,
+                    comicCh.chapters[index].hid.toString(),
+                    detailsComic.first.chapter.hid,
+                    chTitle,
+                    comicCh.chapters[index].chap);
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
                   return ReadPage(
@@ -375,7 +411,7 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
   }
 
   _checkLibrary(int id) async {
-    final getComic = objectBox.comicBox.get(id);
+    final getComic = objectBox.libraryBox.get(id);
     if (getComic != null) {
       print(getComic.toString());
       setState(() {

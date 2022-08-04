@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:komik_flutter/components/comic_item.dart';
 import 'package:komik_flutter/controllers/fetch_comick.dart';
 import 'package:komik_flutter/models/lib_comic.dart';

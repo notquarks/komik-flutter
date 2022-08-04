@@ -1,6 +1,5 @@
 import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter/material.dart';
-import 'package:komik_flutter/collections/comic_col.dart';
 import 'package:komik_flutter/components/comic_item.dart';
 import 'package:komik_flutter/main.dart';
 import 'package:komik_flutter/models/descslug_comic.dart';
@@ -20,18 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool isSearching = false;
   late Stream<List<ComicEntity>> streamComics;
-  // Box<ComicEntity> comicBox = objectBox.store.box<ComicEntity>();
   Box<LibraryEntity> libraryEntity = objectBox.store.box<LibraryEntity>();
-  // Stream<List<ComicEntity>> execQuery() {
-  //   if (!isSearching) {
-  //     _readComicCol(widget.isar);
-  //   }
-  //   return widget.isar.comicCols
-  //       .where()
-  //       .limit(1)
-  //       .build()
-  //       .watch(initialReturn: true);
-  // }
 
   Stream<List<LibraryEntity>> _fetchFavComic() {
     return libraryEntity
@@ -58,12 +46,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: NestedScrollView(
+            floatHeaderSlivers: true,
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [
                 SliverAppBar(
-                  title: const Text('Library'),
                   floating: true,
-                  pinned: false,
+                  title: const Text('Library'),
                   actions: [
                     IconButton(
                         onPressed: () {
@@ -77,8 +65,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ];
             },
-            floatHeaderSlivers: true,
             body: SafeArea(
+              top: false,
               minimum: const EdgeInsets.symmetric(horizontal: 8),
               child: StreamBuilder(
                 stream: _fetchFavComic(),

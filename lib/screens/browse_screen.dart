@@ -8,43 +8,70 @@ import 'package:komik_flutter/screens/comic2_screen.dart';
 import 'package:komik_flutter/screens/comic_screen.dart';
 import 'package:komik_flutter/screens/settings_screen.dart';
 
-class BrowseScreen extends StatelessWidget {
-  const BrowseScreen({Key? key}) : super(key: key);
+class BrowseScreen extends StatefulWidget {
+  const BrowseScreen({Key? key, required this.scrollController})
+      : super(key: key);
+  final ScrollController scrollController;
+
+  @override
+  State<BrowseScreen> createState() => _BrowseScreenState();
+}
+
+class _BrowseScreenState extends State<BrowseScreen>
+    with TickerProviderStateMixin {
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _tabController = TabController(length: 2, vsync: this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        body: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                title: const Text('Browse'),
-                floating: true,
-                pinned: true,
-                actions: [
-                  IconButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) {
-                          return SettingPage();
-                        }));
-                      },
-                      icon: const Icon(Icons.settings))
-                ],
-                bottom: const TabBar(tabs: [
-                  Tab(child: Text('Popular')),
-                  Tab(child: Text('New')),
-                ]),
-              ),
-            ];
-          },
-          body: TabBarView(children: [
-            TopScreen(),
-            NewScreen(),
-          ]),
-        ),
+    return Scaffold(
+      body: NestedScrollView(
+        controller: widget.scrollController,
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              title: const Text('Browse'),
+              floating: true,
+              pinned: false,
+              snap: true,
+              actions: [
+                IconButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return SettingPage();
+                      }));
+                    },
+                    icon: const Icon(Icons.settings))
+              ],
+              bottom: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  tabs: const [
+                    Tab(child: Text('Popular')),
+                    Tab(child: Text('New')),
+                  ]),
+            ),
+          ];
+        },
+        body: TabBarView(controller: _tabController, children: [
+          TopScreen(),
+          NewScreen(),
+        ]),
       ),
     );
   }
@@ -52,7 +79,6 @@ class BrowseScreen extends StatelessWidget {
 
 class TopScreen extends StatefulWidget {
   TopScreen({Key? key}) : super(key: key);
-
   @override
   State<TopScreen> createState() => _TopScreenState();
 }

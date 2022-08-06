@@ -14,12 +14,35 @@ class ReadPage extends StatefulWidget {
   State<ReadPage> createState() => _ReadPageState();
 }
 
-class _ReadPageState extends State<ReadPage> {
+class _ReadPageState extends State<ReadPage>
+    with SingleTickerProviderStateMixin {
   List<DetailsComic> detailsComic = <DetailsComic>[];
+  TapDownDetails? tapDownDetails;
+  late TransformationController _transformationController;
+  final ScrollController _scrollController = ScrollController();
+  late AnimationController _animationController;
+  Animation<Matrix4>? _animation;
+
   @override
   void initState() {
     _fetchData(widget.hid);
+    _transformationController = TransformationController();
+    _scrollController;
+    _animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 300))
+      ..addListener(() {
+        _transformationController.value = _animation!.value;
+      });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _transformationController.dispose();
+    _scrollController.dispose();
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future _fetchData(String hid) async {
@@ -33,58 +56,82 @@ class _ReadPageState extends State<ReadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: (detailsComic.isNotEmpty)
-          ? Scrollbar(
-              thumbVisibility: true,
-              interactive: true,
-              thickness: 12,
-              radius: Radius.circular(10),
-              child: CustomScrollView(
-                slivers: [
-                  SliverAppBar(
-                    title: Text(
-                        'Ch. ${widget.ch} ${widget.title == 'null' ? '' : widget.title}'),
-                    floating: true,
-                    actions: [
-                      IconButton(onPressed: () {}, icon: const Icon(Icons.sort))
-                    ],
-                  ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      childCount: detailsComic.first.chapter.mdImages.length,
-                      (context, index) {
-                        return Container(
-                          child:
-                              // child: Image.network(
-                              //     'https://meo.comick.pictures/${detailsComic.first.chapter.mdImages[index].b2Key}'),
-                              CachedNetworkImage(
-                            filterQuality: FilterQuality.medium,
+          ? CustomScrollView(slivers: [
+              SliverAppBar(
+                title: Text(
+                    'Ch. ${widget.ch} ${widget.title == 'null' ? '' : widget.title}'),
+                floating: true,
+                actions: [
+                  IconButton(onPressed: () {}, icon: const Icon(Icons.sort))
+                ],
+              ),
+              SliverFillRemaining(
+                child: GestureDetector(
+                  onDoubleTapDown: ((details) => tapDownDetails = details),
+                  onDoubleTap: () {
+                    final position = tapDownDetails!.localPosition;
+                    final double scale = 3;
+                    final x = -position.dx * (scale - 1);
+                    final y = -position.dy * (scale - 1);
+                    final zoomed = Matrix4.identity()
+                      ..translate(x, y)
+                      ..scale(scale);
+                    final end = _transformationController.value.isIdentity()
+                        ? zoomed
+                        : Matrix4.identity();
+                    _animation = Matrix4Tween(
+                            begin: _transformationController.value, end: end)
+                        .animate(CurveTween(curve: Curves.easeOut)
+                            .animate(_animationController));
+                    _animationController.forward(from: 0);
+                  },
+                  child: Scrollbar(
+                    controller: _scrollController,
+                    thumbVisibility: true,
+                    interactive: true,
+                    thickness: 7,
+                    radius: Radius.circular(10),
+                    child: InteractiveViewer(
+                      transformationController: _transformationController,
+                      panEnabled: true,
+                      scaleEnabled: false,
+                      clipBehavior: Clip.none,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: detailsComic.first.chapter.mdImages.length,
+                        itemBuilder: (context, index) {
+                          return CachedNetworkImage(
+                            filterQuality: FilterQuality.high,
                             fit: BoxFit.fitWidth,
                             maxWidthDiskCache:
-                                (MediaQuery.of(context).size.width * 0.98)
+                                (MediaQuery.of(context).size.width * 1.05)
                                     .toInt(),
                             imageUrl:
                                 'https://meo.comick.pictures/${detailsComic.first.chapter.mdImages[index].b2Key}',
-                            placeholder: (context, url) => CachedNetworkImage(
-                              imageUrl:
-                                  'https://i0.wp.com/elkadii.ponpes.id/wp-content/uploads/2018/10/placeholder.jpg?ssl=1',
-                              fit: BoxFit.fitWidth,
-                              cacheKey: "meo.comick.pictures",
-                              cacheManager: CacheManager(Config(
-                                "meo.comick.pictures",
-                                maxNrOfCacheObjects: 10,
-                                stalePeriod: const Duration(days: 2),
-                              )),
+                            progressIndicatorBuilder:
+                                (context, url, progress) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 180),
+                              child: Center(
+                                child: SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                  child: CircularProgressIndicator(
+                                    value: progress.progress,
+                                  ),
+                                ),
+                              ),
                             ),
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.error),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  )
-                ],
+                  ),
+                ),
               ),
-            )
+            ])
           : _loadingIndicator(),
     );
   }

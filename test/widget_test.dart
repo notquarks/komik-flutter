@@ -7,8 +7,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:komik_flutter/collections/comic_col.dart';
-import 'package:komik_flutter/collections/history_col.dart';
 
 import 'package:komik_flutter/main.dart';
 import 'package:path_provider/path_provider.dart';

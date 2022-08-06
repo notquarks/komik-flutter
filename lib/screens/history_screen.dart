@@ -1,8 +1,10 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:komik_flutter/controllers/db_interface.dart';
 import 'package:komik_flutter/models/entity/comic_entity.dart';
 import 'package:komik_flutter/models/entity/history_entity.dart';
+import 'package:komik_flutter/themes/custom_theme.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:komik_flutter/main.dart';
 import 'package:komik_flutter/models/entity/chread_entity.dart';
@@ -10,8 +12,9 @@ import 'package:komik_flutter/models/entity/library_entity.dart';
 import 'package:komik_flutter/objectbox.g.dart';
 
 class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({Key? key}) : super(key: key);
-
+  const HistoryScreen({Key? key, required this.scrollController})
+      : super(key: key);
+  final ScrollController scrollController;
   @override
   State<HistoryScreen> createState() => _HistoryScreenState();
 }
@@ -37,10 +40,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
+        controller: widget.scrollController,
         slivers: [
           SliverAppBar(
             title: const Text('History'),
             floating: true,
+            snap: true,
+            pinned: false,
             actions: [
               IconButton(
                   onPressed: () {
@@ -50,10 +56,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ],
           ),
           SliverFillRemaining(
-            fillOverscroll: true,
             child: SafeArea(
               top: false,
-              minimum: EdgeInsets.symmetric(horizontal: 6),
+              minimum: const EdgeInsets.symmetric(horizontal: 6),
               child: StreamBuilder<List<HistoryEntity>>(
                   stream: _fetchRecentHistory(),
                   builder: (context, snapshot) {
@@ -73,6 +78,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             // print(history.history.target!.ch_title);
                             // print(history.history.target!.comic.target!.title);
                             return Card(
+                              color: const Color.fromARGB(255, 61, 66, 75),
                               child: ListTile(
                                 title: Text(history
                                     .history.target!.comic.target!.title),

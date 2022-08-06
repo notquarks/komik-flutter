@@ -366,7 +366,7 @@ class _ComicPageState extends ConsumerState<ComicPage> {
           final chTitle = 'Ch. ${comicCh.chapters[index].chap} '
               ' ${comicCh.chapters[index].title ?? ''}';
           return Card(
-            // color: const Color.fromARGB(255, 48, 52, 60),
+            color: const Color.fromARGB(255, 48, 52, 60),
             child: ListTile(
               onTap: () {
                 //**

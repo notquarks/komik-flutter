@@ -10,8 +10,9 @@ import 'package:komik_flutter/screens/comic_screen.dart';
 import 'package:komik_flutter/screens/settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
-
+  const HomeScreen({Key? key, required this.scrollController})
+      : super(key: key);
+  final ScrollController scrollController;
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -46,11 +47,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: NestedScrollView(
+            controller: widget.scrollController,
             floatHeaderSlivers: true,
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [
                 SliverAppBar(
                   floating: true,
+                  snap: true,
+                  pinned: false,
                   title: const Text('Library'),
                   actions: [
                     IconButton(

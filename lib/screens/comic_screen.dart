@@ -83,26 +83,27 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                 title: Text(widget.title),
                 floating: true,
               ),
-              _detailsComic(descComic.first),
-              SliverToBoxAdapter(child: Divider()),
+              _detailsComic(descComic.first, context),
+              const SliverToBoxAdapter(child: const Divider()),
               SliverPadding(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 //Dislay Total Chapters
                 sliver: SliverToBoxAdapter(
                   child: Text(
                     '${chaptersComic.first.total} Chapters',
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),
-              SliverToBoxAdapter(child: Divider()),
+              const SliverToBoxAdapter(child: Divider()),
               _listComicChapters(chaptersComic.first)
             ])
           : _loadingIndicator(),
     );
   }
 
-  Widget _detailsComic(ComicDescSlug comicDetails) {
+  Widget _detailsComic(ComicDescSlug comicDetails, BuildContext context) {
     return SliverToBoxAdapter(
       child: Column(
         children: [
@@ -121,22 +122,27 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                       imageUrl: widget.cvUrl,
                       fit: BoxFit.cover,
                       width: 1080,
-                      height: 250,
+                      height: 255,
                     ),
                   ],
                 ),
               ),
               //Background Gradient Cover
               Container(
-                height: 900,
-                decoration: const BoxDecoration(
+                height: 670,
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color.fromARGB(238, 53, 76, 102),
-                        Color.fromARGB(240, 37, 37, 63),
-                        Color.fromARGB(255, 38, 41, 48)
+                        Theme.of(context)
+                            .scaffoldBackgroundColor
+                            .withOpacity(0.92),
+                        Theme.of(context)
+                            .scaffoldBackgroundColor
+                            .withOpacity(0.92),
+                        Theme.of(context).scaffoldBackgroundColor,
+                        // Color.fromARGB(255, 38, 41, 48)
                       ]),
                 ),
                 child: Padding(
@@ -156,10 +162,12 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 SizedBox(
-                                  width: 120,
+                                  width: 110,
+                                  height: 168,
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(15.0),
                                     child: CachedNetworkImage(
+                                      fit: BoxFit.cover,
                                       imageUrl: widget.cvUrl,
                                     ),
                                   ),
@@ -188,13 +196,7 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                                   : ElevatedButton(
                                       onPressed: () {
                                         objectBox.addToLib(widget.id);
-                                        // objectBox.addComic(
-                                        //     widget.id,
-                                        //     widget.hid,
-                                        //     widget.title,
-                                        //     widget.slug,
-                                        //     widget.chap,
-                                        //     widget.cvUrl);
+
                                         _checkLibrary();
                                       },
                                       child: const Text('Add to Library')),
@@ -208,9 +210,12 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                                           'https://comick.fun/comic/${comicDetails.comic.slug}'),
                                     );
                                   },
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.public,
-                                    color: Color.fromRGBO(139, 157, 195, 1),
+                                    color: Theme.of(context)
+                                        .buttonTheme
+                                        .colorScheme
+                                        ?.onSurface,
                                   ),
                                 ),
                               ),
@@ -224,9 +229,12 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                                         msg: "Link Copied !");
                                   });
                                 },
-                                child: const Icon(
+                                child: Icon(
                                   Icons.link,
-                                  color: Color.fromRGBO(139, 157, 195, 1),
+                                  color: Theme.of(context)
+                                      .buttonTheme
+                                      .colorScheme
+                                      ?.onSurface,
                                 ),
                               )
                             ],
@@ -252,8 +260,7 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                     children: [
                       // DescText(),
                       ExpandablePanel(
-                        theme:
-                            const ExpandableThemeData(iconColor: Colors.white),
+                        // theme: const ExpandableThemeData(),
                         header: const Padding(
                           padding: EdgeInsets.only(top: 10.0, left: 15),
                           child: Text('About'),
@@ -267,7 +274,6 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                                 "p": Style(
                                   textOverflow: TextOverflow.ellipsis,
                                   maxLines: 2,
-                                  color: Colors.white,
                                 )
                               }),
                         ),
@@ -366,7 +372,7 @@ class _ComicPageState extends ConsumerState<ComicPage> {
           final chTitle = 'Ch. ${comicCh.chapters[index].chap} '
               ' ${comicCh.chapters[index].title ?? ''}';
           return Card(
-            color: const Color.fromARGB(255, 48, 52, 60),
+            // color: const Color.fromARGB(255, 48, 52, 60),
             child: ListTile(
               onTap: () {
                 //**
@@ -379,16 +385,6 @@ class _ComicPageState extends ConsumerState<ComicPage> {
                     widget.hid,
                     chTitle,
                     comicCh.chapters[index].chap);
-                // objectBox.addToHistory(
-                //     chTitle,
-                //     comicCh.chapters[index].hid.toString(),
-                //     comicCh.chapters[index].id,
-                //     readed_chap,
-                //     widget.id,
-                //     widget.hid,
-                //     widget.title,
-                //     widget.cvUrl,
-                //     widget.slug);
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
                   return ReadPage(

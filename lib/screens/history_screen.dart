@@ -4,7 +4,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:komik_flutter/controllers/db_interface.dart';
 import 'package:komik_flutter/models/entity/comic_entity.dart';
 import 'package:komik_flutter/models/entity/history_entity.dart';
-import 'package:komik_flutter/themes/custom_theme.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:komik_flutter/main.dart';
 import 'package:komik_flutter/models/entity/chread_entity.dart';

@@ -2,53 +2,62 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:komik_flutter/controllers/db_interface.dart';
+import 'package:komik_flutter/providers/settings.dart';
 import 'package:komik_flutter/screens/browse_screen.dart';
 import 'package:komik_flutter/screens/history_screen.dart';
 import 'package:komik_flutter/screens/library_screen.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 late ObjectBox objectBox;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // final dir = await getApplicationSupportDirectory();
+  final prefs = await SharedPreferences.getInstance();
   objectBox = await ObjectBox.create();
   runApp(
-    const ProviderScope(child: MyApp()),
+    ProviderScope(overrides: [
+      sharedPreferencesProvider.overrideWithValue(prefs),
+    ], child: const MyApp()),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Baca Komik on Flutter',
-      themeMode: ThemeMode.dark,
-      darkTheme: FlexThemeData.dark(
-        scheme: FlexScheme.brandBlue,
-        useMaterial3: true,
-        surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
-        blendLevel: 15,
-        appBarStyle: FlexAppBarStyle.background,
-        appBarOpacity: 0.90,
-        subThemesData: const FlexSubThemesData(
-          blendOnLevel: 30,
-        ),
-      ),
+      themeMode: ref.watch(darkModeProvider).getDarkMode()
+          ? ThemeMode.dark
+          : ThemeMode.light,
       theme: FlexThemeData.light(
-        scheme: FlexScheme.brandBlue,
-        useMaterial3: true,
+        scheme: FlexScheme.purpleBrown,
         surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
         blendLevel: 20,
+        appBarOpacity: 0.95,
         subThemesData: const FlexSubThemesData(
           blendOnLevel: 20,
           blendOnColors: false,
         ),
         visualDensity: FlexColorScheme.comfortablePlatformDensity,
+        useMaterial3: true,
+        fontFamily: GoogleFonts.robotoFlex().fontFamily,
+      ),
+      darkTheme: FlexThemeData.dark(
+        scheme: FlexScheme.purpleBrown,
+        surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
+        blendLevel: 15,
+        appBarStyle: FlexAppBarStyle.background,
+        appBarOpacity: 0.95,
+        subThemesData: const FlexSubThemesData(
+          blendOnLevel: 30,
+        ),
+        visualDensity: FlexColorScheme.comfortablePlatformDensity,
+        useMaterial3: true,
+        fontFamily: GoogleFonts.robotoFlex().fontFamily,
       ),
       home: const BottomNavBar(),
     );
@@ -65,11 +74,6 @@ class BottomNavBar extends StatefulWidget {
 class _BottomNavBarState extends State<BottomNavBar> {
   int _selectedIndex = 0;
   late ScrollController scrollController;
-  // final screen = [
-  //   HomeScreen(),
-  //   BrowseScreen(isar: widget.isar),
-  //   HistoryScreen(),
-  // ];
   @override
   void initState() {
     // TODO: implement initState
@@ -119,7 +123,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             NavigationDestination(
               icon: Icon(Icons.collections_bookmark_outlined),
               selectedIcon: Icon(Icons.collections_bookmark),
-              label: 'Home',
+              label: 'Library',
             ),
             NavigationDestination(
               icon: Icon(Icons.explore_outlined),

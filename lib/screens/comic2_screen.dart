@@ -81,8 +81,8 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                 title: Text(widget.comic.title),
                 floating: true,
               ),
-              _detailsComic(widget.comic, descComic.first),
-              const SliverToBoxAdapter(child: const Divider()),
+              _detailsComic(widget.comic, descComic.first, context),
+              const SliverToBoxAdapter(child: Divider()),
               SliverPadding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -100,7 +100,8 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
     );
   }
 
-  Widget _detailsComic(Completion comic, ComicDescSlug comicDetails) {
+  Widget _detailsComic(
+      Completion comic, ComicDescSlug comicDetails, BuildContext context) {
     return SliverToBoxAdapter(
       child: Column(
         children: [
@@ -125,14 +126,19 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
               ),
               Container(
                 height: 670,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color.fromARGB(238, 53, 76, 102),
-                        Color.fromARGB(240, 37, 37, 63),
-                        Color.fromARGB(255, 38, 41, 48)
+                        Theme.of(context)
+                            .scaffoldBackgroundColor
+                            .withOpacity(0.92),
+                        Theme.of(context)
+                            .scaffoldBackgroundColor
+                            .withOpacity(0.92),
+                        Theme.of(context).scaffoldBackgroundColor,
+                        // Color.fromARGB(255, 38, 41, 48)
                       ]),
                 ),
                 child: Padding(
@@ -152,9 +158,11 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                               children: [
                                 SizedBox(
                                   width: 110,
+                                  height: 168,
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(15.0),
                                     child: CachedNetworkImage(
+                                        fit: BoxFit.cover,
                                         imageUrl: (comic.mdCovers.first.gpurl !=
                                                 null)
                                             ? "${comic.mdCovers.first.gpurl}.256.jpg"
@@ -253,14 +261,6 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                                       onPressed: () {
                                         objectBox
                                             .addToLib(descComic.first.comic.id);
-                                        // objectBox.addComic(
-                                        //     descComic.first.comic.id,
-                                        //     detailsComic.first.chapter.hid,
-                                        //     widget.comic.title,
-                                        //     widget.slug,
-                                        //     chaptersComic.first.total
-                                        //         .toString(),
-                                        //     widget.cvUrl);
                                         _checkLibrary(descComic.first.comic.id);
                                       },
                                       child: const Text('Add to Library')),
@@ -315,8 +315,8 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                     children: [
                       // DescText(),
                       ExpandablePanel(
-                        theme:
-                            const ExpandableThemeData(iconColor: Colors.white),
+                        // theme:
+                        //     const ExpandableThemeData(iconColor: Colors.white),
                         header: const Padding(
                           padding: EdgeInsets.only(top: 10.0, left: 15),
                           child: Text('About'),
@@ -330,7 +330,6 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
                                 "p": Style(
                                   textOverflow: TextOverflow.ellipsis,
                                   maxLines: 2,
-                                  color: Colors.white,
                                 )
                               }),
                         ),
@@ -359,7 +358,7 @@ class _ComicPage2State extends ConsumerState<ComicPage2> {
           final chTitle = 'Ch. ${comicCh.chapters[index].chap} '
               ' ${comicCh.chapters[index].title ?? ''}';
           return Card(
-            color: const Color.fromARGB(255, 48, 52, 60),
+            color: Theme.of(context).cardColor,
             child: ListTile(
               onTap: () {
                 objectBox.addToHistory(

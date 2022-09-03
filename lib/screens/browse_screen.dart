@@ -99,19 +99,21 @@ class _TopScreenState extends State<TopScreen> {
   }
 
   Future<void> _fetchPage(int pageKey) async {
-    try {
-      final newItems = await ComickApi.getTopComic(pageKey);
-      final isLastPage = pageKey >= _pageSize;
-      if (isLastPage) {
-        _pagingController.appendLastPage(newItems);
-      } else {
-        final nextPageKey = pageKey + 1;
-        _pagingController.appendPage(newItems, nextPageKey);
-        print(nextPageKey);
+    if (mounted) {
+      try {
+        final newItems = await ComickApi.getTopComic(pageKey);
+        final isLastPage = pageKey >= _pageSize;
+        if (isLastPage) {
+          _pagingController.appendLastPage(newItems);
+        } else {
+          final nextPageKey = pageKey + 1;
+          _pagingController.appendPage(newItems, nextPageKey);
+          // print(nextPageKey);
+        }
+      } catch (error) {
+        print(error.toString());
+        _pagingController.error = error;
       }
-    } catch (error) {
-      print(error.toString());
-      _pagingController.error = error;
     }
   }
 
@@ -130,13 +132,6 @@ class _TopScreenState extends State<TopScreen> {
         ),
         child: CustomScrollView(
           slivers: [
-            // SliverAppBar(
-            //   title: Text('Browse'),
-            //   floating: true,
-            //   snap: true,
-            //   pinned: false,
-            //   actions: [IconButton(onPressed: () {}, icon: Icon(Icons.sort))],
-            // ),
             SliverSafeArea(
               bottom: false,
               minimum: const EdgeInsets.symmetric(horizontal: 8),
@@ -202,17 +197,17 @@ class _NewScreenState extends State<NewScreen> {
     // final newItems = await ComickApi.getListOfComic(pageKey);
     try {
       final newItems = await ComickApi.getListOfComic(pageKey);
-      print(newItems.length);
+      // print(newItems.length);
       final isLastPage = pageKey > _pageSize;
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
       } else {
         final nextPageKey = pageKey + 1;
         _pagingController.appendPage(newItems, nextPageKey);
-        print(nextPageKey);
+        // print(nextPageKey);
       }
     } catch (error) {
-      print('error');
+      print('error : ${error.toString()}');
       _pagingController.error = error;
     }
   }
@@ -301,19 +296,21 @@ class _ComicGridState extends State<ComicGrid> {
   }
 
   Future<void> _fetchPage(int pageKey) async {
-    try {
-      final newItems = await ComickApi.getListOfComic(pageKey);
-      // print(newItems.length);
-      final isLastPage = pageKey > _pageSize;
-      if (isLastPage) {
-        _pagingController.appendLastPage(newItems);
-      } else {
-        final nextPageKey = pageKey + 1;
-        _pagingController.appendPage(newItems, nextPageKey);
+    if (mounted) {
+      try {
+        final newItems = await ComickApi.getListOfComic(pageKey);
+        // print(newItems.length);
+        final isLastPage = pageKey > _pageSize;
+        if (isLastPage) {
+          _pagingController.appendLastPage(newItems);
+        } else {
+          final nextPageKey = pageKey + 1;
+          _pagingController.appendPage(newItems, nextPageKey);
+        }
+      } catch (error) {
+        // print('error');
+        _pagingController.error = error;
       }
-    } catch (error) {
-      // print('error');
-      _pagingController.error = error;
     }
   }
 

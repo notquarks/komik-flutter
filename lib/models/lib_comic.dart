@@ -22,7 +22,7 @@ class LibComic {
     required this.upCount,
     required this.lang,
     required this.downCount,
-    required this.mdImages,
+    // required this.mdImages,
     required this.mdComics,
     required this.max,
     required this.count,
@@ -40,7 +40,7 @@ class LibComic {
   final int upCount;
   final String lang;
   final int downCount;
-  final List<MdImage> mdImages;
+  // final List<MdImage?> mdImages;
   final MdComics mdComics;
   final double max;
   final int count;
@@ -58,8 +58,8 @@ class LibComic {
         upCount: json["up_count"],
         lang: json["lang"],
         downCount: json["down_count"],
-        mdImages: List<MdImage>.from(
-            json["md_images"].map((x) => MdImage.fromJson(x))),
+        // mdImages: List<MdImage>.from(
+        //     json["md_images"]?.map((x) => MdImage.fromJson(x))),
         mdComics: MdComics.fromJson(json["md_comics"]),
         max: json["max"].toDouble(),
         count: json["count"],
@@ -78,7 +78,7 @@ class LibComic {
         "up_count": upCount,
         "lang": lang,
         "down_count": downCount,
-        "md_images": List<dynamic>.from(mdImages.map((x) => x.toJson())),
+        // "md_images": List<dynamic>.from(mdImages.map((x) => x?.toJson())),
         "md_comics": mdComics.toJson(),
         "max": max,
         "count": count,

@@ -29,7 +29,7 @@ class ComicListItem extends StatelessWidget {
                   width: 214,
                   height: 311,
                   child: CachedNetworkImage(
-                    fit: BoxFit.fitHeight,
+                    fit: BoxFit.cover,
                     maxHeightDiskCache: 300,
                     maxWidthDiskCache: 200,
                     imageUrl: (comic.mdComics.mdCovers[0].gpurl != null)
@@ -89,7 +89,7 @@ class ComicListItem2 extends StatelessWidget {
                   width: 214,
                   height: 311,
                   child: CachedNetworkImage(
-                    fit: BoxFit.fitHeight,
+                    fit: BoxFit.cover,
                     maxHeightDiskCache: 300,
                     maxWidthDiskCache: 200,
                     imageUrl: (comict.mdCovers.first.gpurl != null)

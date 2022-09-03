@@ -70,7 +70,7 @@ class _ReadPageState extends State<ReadPage>
                   onDoubleTapDown: ((details) => tapDownDetails = details),
                   onDoubleTap: () {
                     final position = tapDownDetails!.localPosition;
-                    final double scale = 3;
+                    final double scale = 2;
                     final x = -position.dx * (scale - 1);
                     final y = -position.dy * (scale - 1);
                     final zoomed = Matrix4.identity()
@@ -90,7 +90,7 @@ class _ReadPageState extends State<ReadPage>
                     thumbVisibility: true,
                     interactive: true,
                     thickness: 7,
-                    radius: Radius.circular(10),
+                    radius: const Radius.circular(10),
                     child: InteractiveViewer(
                       transformationController: _transformationController,
                       panEnabled: true,
@@ -111,7 +111,7 @@ class _ReadPageState extends State<ReadPage>
                             progressIndicatorBuilder:
                                 (context, url, progress) => Padding(
                               padding:
-                                  const EdgeInsets.symmetric(vertical: 180),
+                                  const EdgeInsets.symmetric(vertical: 140),
                               child: Center(
                                 child: SizedBox(
                                   width: 40,

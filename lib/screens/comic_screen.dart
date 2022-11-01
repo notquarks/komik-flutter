@@ -14,6 +14,7 @@ import 'package:komik_flutter/models/entity/library_entity.dart';
 import 'package:komik_flutter/models/lchap_comic.dart';
 import 'package:komik_flutter/models/lib_comic.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:palette_generator/palette_generator.dart';
 import 'package:komik_flutter/objectbox.g.dart';
 import 'package:komik_flutter/screens/read_screen.dart';
 import 'package:url_launcher/url_launcher.dart';

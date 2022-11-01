@@ -77,7 +77,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             // print(history.history.target!.ch_title);
                             // print(history.history.target!.comic.target!.title);
                             return Card(
-                              color: const Color.fromARGB(255, 61, 66, 75),
+                              // color: const Color.fromARGB(255, 61, 66, 75),
                               child: ListTile(
                                 title: Text(history
                                     .history.target!.comic.target!.title),

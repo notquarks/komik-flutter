@@ -15,7 +15,7 @@ class LibComic {
     required this.id,
     required this.status,
     required this.chap,
-    required this.lastAt,
+    // required this.lastAt,
     required this.hid,
     required this.createdAt,
     required this.updatedAt,
@@ -24,16 +24,16 @@ class LibComic {
     required this.downCount,
     // required this.mdImages,
     required this.mdComics,
-    required this.max,
+    // required this.max,
     required this.count,
-    required this.distanceTime,
-    required this.lastAtDate,
+    // required this.distanceTime,
+    // required this.lastAtDate,
   });
 
   final int id;
   final String status;
   final String? chap;
-  final DateTime lastAt;
+  // final DateTime lastAt;
   final String hid;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -42,16 +42,16 @@ class LibComic {
   final int downCount;
   // final List<MdImage?> mdImages;
   final MdComics mdComics;
-  final double max;
+  // final double? max;
   final int count;
-  final String distanceTime;
-  final DateTime lastAtDate;
+  // final String distanceTime;
+  // final DateTime lastAtDate;
 
   factory LibComic.fromJson(Map<String, dynamic> json) => LibComic(
         id: json["id"],
         status: json["status"],
         chap: json["chap"],
-        lastAt: DateTime.parse(json["last_at"]),
+        // lastAt: DateTime.parse(json["last_at"]),
         hid: json["hid"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
@@ -61,17 +61,17 @@ class LibComic {
         // mdImages: List<MdImage>.from(
         //     json["md_images"]?.map((x) => MdImage.fromJson(x))),
         mdComics: MdComics.fromJson(json["md_comics"]),
-        max: json["max"].toDouble(),
+        // max: json["max"] ?? 0.0,
         count: json["count"],
-        distanceTime: json["distanceTime"],
-        lastAtDate: DateTime.parse(json["last_at_date"]),
+        // distanceTime: json["distanceTime"],
+        // lastAtDate: DateTime.parse(json["last_at_date"]),
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "status": status,
         "chap": chap,
-        "last_at": lastAt.toIso8601String(),
+        // "last_at": lastAt.toIso8601String(),
         "hid": hid,
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
@@ -80,10 +80,10 @@ class LibComic {
         "down_count": downCount,
         // "md_images": List<dynamic>.from(mdImages.map((x) => x?.toJson())),
         "md_comics": mdComics.toJson(),
-        "max": max,
+        // "max": max,
         "count": count,
-        "distanceTime": distanceTime,
-        "last_at_date": lastAtDate.toIso8601String(),
+        // "distanceTime": distanceTime,
+        // "last_at_date": lastAtDate.toIso8601String(),
       };
 }
 

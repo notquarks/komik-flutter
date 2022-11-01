@@ -394,7 +394,7 @@ class Next {
   dynamic groupName;
   String? lang;
   dynamic mdGroupId;
-  List<dynamic> mdChaptersGroups;
+  List<dynamic>? mdChaptersGroups;
   String? href;
 
   factory Next.fromJson(Map<String, dynamic> json) => Next(
@@ -406,8 +406,7 @@ class Next {
         groupName: json["group_name"],
         lang: json["lang"],
         mdGroupId: json["md_group_id"],
-        mdChaptersGroups:
-            List<dynamic>.from(json["md_chapters_groups"].map((x) => x)),
+        mdChaptersGroups: json["md_chapters_groups"],
         href: json["href"] == null ? null : json["href"],
       );
 
@@ -420,8 +419,7 @@ class Next {
         "group_name": groupName,
         "lang": lang,
         "md_group_id": mdGroupId,
-        "md_chapters_groups":
-            List<dynamic>.from(mdChaptersGroups.map((x) => x)),
+        "md_chapters_groups": mdChaptersGroups,
         "href": href == null ? null : href,
       };
 }

@@ -36,7 +36,7 @@ class ComickApi {
     var response = await http.get(Uri.parse(url));
     var jsonresult = topComicFromJson(response.body);
     topComic.add(jsonresult);
-    print('top: ${jsonresult.rank.length}');
+    // print('top: ${jsonresult.rank.length}');
     // print('Fetch called');
     return topComic.first.rank;
   }
@@ -44,7 +44,7 @@ class ComickApi {
   static Future<List<DetailsComic>> getComicDetails(String hid) async {
     const url = 'https://api.comick.fun/chapter/';
     List<DetailsComic> detailsComick = [];
-    var response = await http.get(Uri.parse(url + '$hid'));
+    var response = await http.get(Uri.parse(url + hid));
     var jsonresult = detailsComicFromJson(response.body);
     detailsComick.add(jsonresult);
     // print(jsonresult.chapter);
@@ -58,7 +58,7 @@ class ComickApi {
     var response = await http.get(Uri.parse(url + '$id/chapter?lang=en'));
     var jsonresult = listChaptersFromJson(response.body);
     listChapters.add(jsonresult);
-    print(jsonresult.chapters.length);
+    // print(jsonresult.chapters.length);
     // print('Fetch called');
     return listChapters;
   }
@@ -69,7 +69,7 @@ class ComickApi {
     var response = await http.get(Uri.parse(url + '$slug'));
     var jsonresult = comicDescSlugFromJson(response.body);
     descComic.add(jsonresult);
-    print(jsonresult);
+    // print(jsonresult);
     // print('Fetch called');
     return descComic;
   }

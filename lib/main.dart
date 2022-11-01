@@ -76,14 +76,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
   late ScrollController scrollController;
   @override
   void initState() {
-    // TODO: implement initState
     scrollController = ScrollController();
     super.initState();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     scrollController.dispose();
     super.dispose();
   }
@@ -98,16 +96,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
     switch (index) {
       case 0:
         return HomeScreen(scrollController: scrollController);
-        break;
       case 1:
         return BrowseScreen(scrollController: scrollController);
-        break;
       case 2:
         return HistoryScreen(scrollController: scrollController);
-        break;
       default:
         return HomeScreen(scrollController: scrollController);
-        break;
     }
   }
 
@@ -164,14 +158,12 @@ class _HideBottomNavBarState extends State<HideBottomNavBar> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     widget.scrollController.addListener(listen);
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     widget.scrollController.removeListener(listen);
     super.dispose();
   }

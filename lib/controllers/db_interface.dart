@@ -3,7 +3,6 @@ import 'package:komik_flutter/models/entity/chread_entity.dart';
 import 'package:komik_flutter/models/entity/library_entity.dart';
 import 'package:komik_flutter/models/entity/history_entity.dart';
 import 'package:komik_flutter/objectbox.g.dart';
-import 'package:objectbox/objectbox.dart';
 
 class ObjectBox {
   late final Store store;

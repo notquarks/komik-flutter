@@ -194,21 +194,23 @@ class _NewScreenState extends State<NewScreen> {
   }
 
   Future<void> _fetchPage(int pageKey) async {
-    // final newItems = await ComickApi.getListOfComic(pageKey);
-    try {
-      final newItems = await ComickApi.getListOfComic(pageKey);
-      // print(newItems.length);
-      final isLastPage = pageKey > _pageSize;
-      if (isLastPage) {
-        _pagingController.appendLastPage(newItems);
-      } else {
-        final nextPageKey = pageKey + 1;
-        _pagingController.appendPage(newItems, nextPageKey);
-        // print(nextPageKey);
+    final newItems = await ComickApi.getListOfComic(pageKey);
+    if (mounted) {
+      try {
+        final newItems = await ComickApi.getListOfComic(pageKey);
+        // print(newItems.length);
+        final isLastPage = pageKey > _pageSize;
+        if (isLastPage) {
+          _pagingController.appendLastPage(newItems);
+        } else {
+          final nextPageKey = pageKey + 1;
+          _pagingController.appendPage(newItems, nextPageKey);
+          // print(nextPageKey);
+        }
+      } catch (error) {
+        print('error : ${error.toString()}');
+        _pagingController.error = error;
       }
-    } catch (error) {
-      print('error : ${error.toString()}');
-      _pagingController.error = error;
     }
   }
 
